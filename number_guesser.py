@@ -50,7 +50,7 @@ def guesser(min,max):
         # increment their guess counter.            
         guesses+=1
     #Tell them that they got it right along with how many guesses it        
-    print(f'Correct the number was {num}, and it only took you {guesses}')
+    print(f'Correct the number was {num}, and it only took you {guesses} guesses.')
     
 # The primary function that handles the number guessing and seeing if the user is done.    
 def number_guesser(min,max):
