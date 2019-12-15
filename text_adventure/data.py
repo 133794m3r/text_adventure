@@ -1,3 +1,11 @@
+'''
+Basic Text Adventure in Python
+Data File
+This file contains all of the items in the game world and it's intialization.
+Macarthur Inbody
+AGPLv3 or Later
+2019
+'''
 def initialize_world():
     global mailbox,starter,north,east,west,south,world
 	world=World()

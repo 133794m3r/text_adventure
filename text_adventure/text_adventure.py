@@ -1,4 +1,13 @@
 #!/usr/bin/python3
+'''
+Basic Text Adventure in Python
+The Main Game iteself.
+This file contains the main game functions.
+Macarthur Inbody
+AGPLv3 or Later
+2019
+'''
+
 import templates
 import sys
 

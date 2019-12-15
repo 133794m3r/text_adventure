@@ -1,3 +1,12 @@
+'''
+Basic Text Adventure in Python
+Class Library File
+This file contains all of the classes that are used in the game.
+Macarthur Inbody
+AGPLv3 or Later
+2019
+'''
+
 #change the location to be player instead of
 #a room id for where the item is. The location will
 #be a signed int. If the item is gone it becomes None meaning
@@ -28,7 +37,8 @@ class Weapon(Item):
 	def __init__(self,damage=dmg,desc=desc):
 		self.damage=dmg
 		self.desc=desc
-
+		
+	
 class World():
 	rooms={}
 	def __init__(self):
