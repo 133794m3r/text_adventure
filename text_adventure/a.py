@@ -2,16 +2,16 @@ from unittest import *
 import unittest
 class Room(object):
 
-    def __init__(self, name, description):
-        self.name = name
-        self.description = description
-        self.paths = {}
+	def __init__(self, name, description):
+		self.name = name
+		self.description = description
+		self.paths = {}
 
-    def go(self, direction):
-        return self.paths.get(direction, None)
+	def go(self, direction):
+		return self.paths.get(direction, None)
 
-    def add_paths(self, paths):
-        self.paths.update(paths)
+	def add_paths(self, paths):
+		self.paths.update(paths)
 
 start = Room("Start", "You can go west and down a hole.");
 west = Room("Trees", "There are trees here, you can go east.");

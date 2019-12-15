@@ -8,15 +8,17 @@ AGPLv3 or Later
 2019
 '''
 
-import templates
+from templates import *
 import sys
+from  data import *
+from lib import *
 
 #def intialize():
-#    module_name=globals()['__name__']
-#    module_obj=sys.modules[modname]
+#	module_name=globals()['__name__']
+#	module_obj=sys.modules[modname]
 
 #def main():
-#    intialize()
+#	intialize()
 
 #main()
 prefix='> '
@@ -37,61 +39,45 @@ print('Your action verbs are \033[1m{}\033[0m'.format(' '.join(verbs)))
 print('Your possible movements are \033[1m{}\033[0m'.format(' '.join(directions)))
 
 #rewrite to have it look through the 4 cardinal directions to make it more easy for them to add items to it.
-def check_move(direction):
-    global current_room
-    if direction not in directions:
-        print('You didn\'t enter a valid movement.')
-    else:
-        dir_id=directions.index(direction)
-        if dir_id in valid_moves[current_room]:
-            if current_room != 0:
-                current_room=0
-            else:
-                if dir_id == 0:
-                    current_room=1
-                elif dir_id == 1:
-                    current_room=3
-                elif dir_id == 2:
-                    current_room=4
-                elif dir_id == 3:
-                    current_room=2
-        
-def look(obj):
-    if obj is None:
-        print(rooms[current_room]['desc'])
-    else:
-        if obj in rooms[current_room]['items']:
-            print(items[obj]['desc'])
-#            print('testme')
+# def check_move(direction):
+# 	global current_room
+# 	if direction not in directions:
+# 		print('You didn\'t enter a valid movement.')
+# 	else:
+# 		dir_id=directions.index(direction)
+# 		if dir_id in valid_moves[current_room]:
+# 			if current_room != 0:
+# 				current_room=0
+# 			else:
+# 				if dir_id == 0:
+# 					current_room=1
+# 				elif dir_id == 1:
+# 					current_room=3
+# 				elif dir_id == 2:
+# 					current_room=4
+# 				elif dir_id == 3:
+# 					current_room=2
+
+# def look(obj):
+# 	if obj is None:
+# 		print(rooms[current_room]['desc'])
+# 	else:
+# 		if obj in rooms[current_room]['items']:
+# 			print(items[obj]['desc'])
+#			print('testme')
 
 def interact(obj):
-    if obj is None:
-        print('You flail your arms about in the air making quite a fool of yourself.')
-    else:
-        print(items[''])
+	if obj is None:
+		print('You flail your arms about in the air making quite a fool of yourself.')
+	else:
+		print(items[''])
 
-def check_input(usr_input):
-    inputs=usr_input.split(' ')
-    verb=inputs[0]
-    if len(inputs) >= 2:
-        obj=inputs[1]
-    else:
-        obj=None
-        
-    if verb in verbs:
-        if verb == 'move':
-            check_move(obj)
-        elif verb == 'look':
-            look(obj)
-    else:
-        print('not valid')
 
 def main_loop():
-    dead=False
-    while dead == False:
-        usr_input=input(prefix)
-        check_input(usr_input)
-#        dead=True
-
+	dead=False
+	while dead == False:
+		usr_input=input(prefix)
+		check_input(usr_input,player)
+#		dead=True
 
 main_loop()
