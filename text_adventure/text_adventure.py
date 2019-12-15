@@ -1,47 +1,15 @@
 #!/usr/bin/python3
-class item:
-    def __init__(self,desc,interact,room):
-        self.desc=desc
-        self.interaction=interact
-        self.in_room=room
-    desc=''
-    interaction=''
-    in_room=None
+import templates
+import sys
 
-class room:
-    desc="You're in a room"
-    items=None
-    mobs=None
-    x=0
-    y=0
-    id=0
-    valid_moves=None
-    def __init__(self,desc=desc,items=items,mobs=mobs,x=x,y=y,id=0,valid_moves=valid_moves)
-        self.valid_moves=valid_moves
-        self.desc=desc
-        self.items=items
-        self.mobs=mobs
-        self.x=x
-        self.y=y
-        self.id=id
+#def intialize():
+#    module_name=globals()['__name__']
+#    module_obj=sys.modules[modname]
 
-class mob:
-    desc="You can't discern anything about it."
-    interact="It just looks at you."
-    room=None
-    def __init__(self,desc=desc,interact=interact,room=room):
-        self.desc=desc
-        self.interact=interact
-        self.in_room=room
+#def main():
+#    intialize()
 
-def initalize():
-    module_name=globals()['__name__']
-    module_obj=sys.modules[modname]
-
-def main():
-    intialize()
-
-main()
+#main()
 prefix='> '
 room_ids={'starter':0,'north':1,'east':2,'south':3,'west':4}
 valid_moves={0:[0,1,2,3],1:[1],2:[2],3:[0],4:[3]}
@@ -61,21 +29,23 @@ print('Your possible movements are \033[1m{}\033[0m'.format(' '.join(directions)
 
 #rewrite to have it look through the 4 cardinal directions to make it more easy for them to add items to it.
 def check_move(direction):
-    dir_id=directions.index(direction)
-    if dir_id in valid_moves[current_room]:
-        if current_room != 0:
-            current_room=0
-        else:
-            if dir_id == 0:
-                current_room=1
-            elif dir_id == 1:
-                current_room=3
-            elif dir_id == 2:
-                current_room=4
-            elif dir_id == 3:
-                current_room=2
+    global current_room
+    if direction not in directions:
+        print('You didn\'t enter a valid movement.')
     else:
-        print('Not a valid movement.')
+        dir_id=directions.index(direction)
+        if dir_id in valid_moves[current_room]:
+            if current_room != 0:
+                current_room=0
+            else:
+                if dir_id == 0:
+                    current_room=1
+                elif dir_id == 1:
+                    current_room=3
+                elif dir_id == 2:
+                    current_room=4
+                elif dir_id == 3:
+                    current_room=2
         
 def look(obj):
     if obj is None:
@@ -89,10 +59,10 @@ def interact(obj):
     if obj is None:
         print('You flail your arms about in the air making quite a fool of yourself.')
     else:
-        print(items[
+        print(items[''])
+
 def check_input(usr_input):
     inputs=usr_input.split(' ')
-    print(len(inputs))
     verb=inputs[0]
     if len(inputs) >= 2:
         obj=inputs[1]
