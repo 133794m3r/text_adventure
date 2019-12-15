@@ -1,0 +1,13 @@
+Exit validation will be done based upon not only the paths but also the directions themselves. Basically it'll simply be a binary based list.
+0=No move. 1=Moveable. It'll be setup like this.
+North,East,South,West
+So for the starter room it'd be
+1,1,1,1
+
+Also the x and y coordinates will be used for validating the rooms and locations that were given previously.
+
+If the exits are given and there is no room then the player will be told that they are "teleported" back to the same room again. The rest of the exits/paths will have to be checked again.
+
+Also the inventory will be given to the player so that they can see their items. For this a new verb called "show", and also "use" will be given to use said item. Also the verb "get" will let you get an item.
+
+Students would be asked to add a new Mob(by extending the base class or one of the sub-classes). A new Weapon. And a new room and place it in the game world showing that they can extend classes with new properties and methods for it. Then they can see it in the game world. Also they can even add new verbs and similar things to make it so that the game can be modified/used by students.
