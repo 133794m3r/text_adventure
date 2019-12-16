@@ -19,12 +19,12 @@ from lib import *
 
 #def main():
 #	intialize()
-
+verbs=['look','grab','move','interact']
 #main()
 prefix='> '
 # room_ids={'starter':0,'north':1,'east':2,'south':3,'west':4}
 # valid_moves={0:[0,1,2,3],1:[1],2:[2],3:[0],4:[3]}
-# directions=['north','south','west','east']
+directions=['north','south','west','east']
 # verbs=['look','grab','move','interact']
 # items={'Mailbox':{'desc':'It is a mailbox with the flag up and the front closed','action':'interact','contains':'letter'},'flashlight':{'desc':'A bright flashlight that\'s still burning.','action':'interact','contains':'batteries'}}
 # mobs=['grue','fish']

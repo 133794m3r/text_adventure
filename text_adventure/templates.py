@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 '''
 Basic Text Adventure in Python
 Class Library File
@@ -84,12 +85,13 @@ class Mailbox(Item):
 		item_name=list(self.contains.keys())[0]
 		item_contained=self.contains[item_name]
 		item_obj={item_name:item_contained}
-		print(item_contained.name)
-		print(self.interaction)
+
 		if self.is_open:
 			item_contained.location=None
-			self.location.remove_item(item_obj)
+			self.location.remove_item(item_name)
+			print(self.interaction.replace('open','close')[:20],end='.\n')
 		else:
+			print(self.interaction)
 			self.location.add_item(item_obj)
 			item_contained.location=self.location
 		self.is_open = not self.is_open

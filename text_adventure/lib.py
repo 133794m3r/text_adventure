@@ -85,6 +85,7 @@ def look(obj,player):
 	nothing_to_see=True
 	if obj is None:
 		print(current_room.desc)
+		nothing_to_see=False
 	else:
 		if current_room.mobs is None:
 			pass
@@ -99,7 +100,3 @@ def look(obj,player):
 
 	if nothing_to_see:
 		print("There is nothing to see here")
-
-
-
-
