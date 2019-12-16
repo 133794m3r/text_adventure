@@ -7,14 +7,15 @@ AGPLv3 or Later
 2019
 '''
 
-#change the location to be player instead of
-#a room id for where the item is. The location will
-#be a signed int. If the item is gone it becomes None meaning
-#that it's gone.
+# change the location to be player instead of
+# a room id for where the item is. The location will
+# be a signed int. If the item is gone it becomes None meaning
+# that it's gone.
 # if it's -1 then it has moved to the player's inventory
 # because that is the "room" or structure id of their inventory.
 class Item:
 	_id=0
+	name="Item"
 	#the item's description
 	desc=''
 	interaction=''
@@ -29,17 +30,26 @@ class Item:
 		#if you have a _ before a property name it means it's meant to be private.
 		# but if you do __ then it's truly private because it can only be acessed through name mangling.
 		self._id=Item._id
-		#increment the item's id this isn't used at this time.
+		#increment the item's id
 		Item._id+=1
 	#this method takes the item from the game world into the user's inventory.
 	def get_item(self,player):
 		#we call the move location method and tell it to put it into the player's inventory so that it's
 		#no longer in the game world.
-		move_location(self,-1)
-		print("You have grabbed {} and put it into your \033[1minventory".format(self.desc))
+		if self.location != -1:
+			move_location(self,-1)
+			player.add_item({self.name:self})
+			print("You have grabbed {} and put it into your \033[1minventory".format(self.name))
+		elif self.location is None:
+			print("This item doesn't exist")
+		elif self.location == -1:
+			print("The item is in your inventory already.")
+		else:
+			print("There is no item.")
 
 	def move_location(self,location):
 		self.location=location
+
 '''
 The weapon class is a child class of the Item class. It extends Item with it's own
 attributes that aren't part of the default item class itself.
@@ -47,6 +57,7 @@ In python when you are doing a sub class of a main class you create it like so.
 class sub_class(main_class):
 instead of the normal attributes.
 '''
+
 class Weapon(Item):
 	damage=0
 	desc='It is a weapon'
@@ -64,9 +75,30 @@ class World():
 
 class Mailbox(Item):
 	contains='letter'
+	is_open=False
 	def __init__(self,contains=contains):
 		Item.__init__(self)
 		self.contains=contains
+
+	def interact(self):
+		item_name=list(self.contains.keys())[0]
+		item_contained=self.contains[item_name]
+		item_obj={item_name:item_contained}
+		print(item_contained.name)
+		print(self.interaction)
+		if self.is_open:
+			item_contained.location=None
+			self.location.remove_item(item_obj)
+		else:
+			self.location.add_item(item_obj)
+			item_contained.location=self.location
+		self.is_open = not self.is_open
+
+
+	def get_item(self):
+		if is_open:
+			print("You pick up the {} and start to read it.\n{}".format(self.contains.name,self.contains.desc))
+
 
 class Player:
 	x=0
@@ -75,6 +107,7 @@ class Player:
 	weapon=None
 	dead=False
 	hp=10
+	inventory=None
 	def __init__(self):
 		self.x=0
 		self.y=0
@@ -106,7 +139,7 @@ class Player:
 		self.hp=self.hp-amount
 
 
-class Inventory(Player):
+class Inventory:
 	items={}
 	def __init__(self,items=items):
 		self.items=items
@@ -142,6 +175,15 @@ class Room:
 		self._id=Room._id
 		Room._id+=1
 
+	def add_item(self,item):
+		self.items.update(item)
+
+	def remove_item(self,item):
+		self.items.pop(item)
+
+	def add_mobs(self,mobs):
+		self.mobs=mobs
+
 	def add_moves(self,moves=exits):
 		self.exits=moves
 
@@ -154,11 +196,12 @@ class Mob:
 	alive=True
 	name='None'
 	hp=5
-	def __init__(self,desc=desc,interact=interact,alive=alive,name=name,hp=hp):
+	grab="It's too large to fit in your pocket."
+	def __init__(self,desc=desc,interact=interact,alive=alive,name=name,hp=hp,grab=grab):
 		self.name=name
 		self.desc=desc
 		self.interact=interact
-		self._id=Mob.id
+		self._id=Mob._id
 		Mob._id+=1
 		self.alive=alive
 		self.hp=hp
