@@ -6,6 +6,7 @@ Macarthur Inbody
 AGPLv3 or Later
 2019
 '''
+
 #change the location to be player instead of
 #a room id for where the item is. The location will
 #be a signed int. If the item is gone it becomes None meaning
@@ -14,22 +15,38 @@ AGPLv3 or Later
 # because that is the "room" or structure id of their inventory.
 class Item:
 	_id=0
+	#the item's description
 	desc=''
 	interaction=''
+	#the item's current location
 	location=None
+	#the intialization method for the object when it's first created.
 	def __init__(self,desc=desc,interact=interaction,location=location):
+		#self is python's version of this.
 		self.desc=desc
 		self.interaction=interact
 		self.location=location
+		#if you have a _ before a property name it means it's meant to be private.
+		# but if you do __ then it's truly private because it can only be acessed through name mangling.
 		self._id=Item._id
+		#increment the item's id this isn't used at this time.
 		Item._id+=1
+	#this method takes the item from the game world into the user's inventory.
 	def get_item(self,player):
+		#we call the move location method and tell it to put it into the player's inventory so that it's
+		#no longer in the game world.
 		move_location(self,-1)
 		print("You have grabbed {} and put it into your \033[1minventory".format(self.desc))
 
 	def move_location(self,location):
 		self.location=location
-
+'''
+The weapon class is a child class of the Item class. It extends Item with it's own
+attributes that aren't part of the default item class itself.
+In python when you are doing a sub class of a main class you create it like so.
+class sub_class(main_class):
+instead of the normal attributes.
+'''
 class Weapon(Item):
 	damage=0
 	desc='It is a weapon'
