@@ -1,0 +1,39 @@
+Formatting codes for all Terminals.
+
+In python you have to do the escape code 033.
+So for python each one would be \033[{CODES}m
+So for bold would be \033[1m.
+0 = Normal/Clear/Reset All
+1 = Bold
+2 = Dim
+4 = Underlined
+5 = Blinking
+7 = Reversed(Invert colors)
+8 = Hidden text aka won't be shown to the user or anyone else.
+
+21 = Reset Bold
+22 = Reset Dim
+24 = Reset Underline
+25 = Reset Blink
+27 = Reset Reverse
+28 = Reset Hidden
+The 8/16 colors for basic xTerm.
+
+Color		Foreground		Background
+Default		39			49
+Black 		30			40
+Red 		31			41
+Green		32			42
+Brown		33			43
+Blue		34			44
+Purple		35			45
+Cyan		36			46
+Light Gray	37			47
+Dark Gray	1;30|90			1;40|100
+Light Red	1;31|91			1;41|101
+Light Green	1;32|92			1;42|102
+Yellow		1;33|93			1;43|103
+Light Blue	1;34|94			1;44|104
+Light Purpple	1;35|95			1;45|105
+Light Cyan	1;36|96			1;46|106
+White		1;37|97			1;47|107

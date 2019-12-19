@@ -7,11 +7,11 @@ Macarthur Inbody
 AGPLv3 or Later
 2019
 '''
-
+from lib import *
 from templates import *
 import sys
 from  data import *
-from lib import *
+
 
 #def intialize():
 #	module_name=globals()['__name__']
@@ -35,15 +35,9 @@ directions=['north','south','west','east']
 print('Enter your name brave traveller.')
 #name=input(prefix)
 name='a';
-print(f'{name} is in a room.')
-print('Your action verbs are \033[1m{}\033[0m'.format(' '.join(verbs)))
-print('Your possible movements are \033[1m{}\033[0m'.format(' '.join(directions)))
-
-def interact(obj):
-	if obj is None:
-		print('You flail your arms about in the air making quite a fool of yourself.')
-	else:
-		print(items[''])
+pretty_print(f'{name} is in a room.')
+pretty_print('Your action verbs are \033[1m{}\033[0m'.format(' '.join(verbs)))
+pretty_print('Your possible movements are \033[1m{}\033[0m'.format(' '.join(directions)))
 
 
 def main_loop():

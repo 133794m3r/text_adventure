@@ -1,3 +1,4 @@
+
 #!/usr/bin/python3
 '''
 Basic Text Adventure in Python
@@ -7,6 +8,7 @@ Macarthur Inbody
 AGPLv3 or Later
 2019
 '''
+import lib
 
 # change the location to be player instead of
 # a room id for where the item is. The location will
@@ -35,18 +37,19 @@ class Item:
 		Item._id+=1
 	#this method takes the item from the game world into the user's inventory.
 	def get_item(self,player):
+		
 		#we call the move location method and tell it to put it into the player's inventory so that it's
 		#no longer in the game world.
 		if self.location != -1:
 			move_location(self,-1)
 			player.add_item({self.name:self})
-			print("You have grabbed {} and put it into your \033[1minventory".format(self.name))
+			lib.pretty_print("You have grabbed {} and put it into your \033[1minventory".format(self.name))
 		elif self.location is None:
-			print("This item doesn't exist")
+			lib.pretty_print("This item doesn't exist")
 		elif self.location == -1:
-			print("The item is in your inventory already.")
+			lib.pretty_print("The item is in your inventory already.")
 		else:
-			print("There is no item.")
+			lib.pretty_print("There is no item.")
 
 	def move_location(self,location):
 		self.location=location
@@ -82,24 +85,27 @@ class Mailbox(Item):
 		self.contains=contains
 
 	def interact(self):
-		item_name=list(self.contains.keys())[0]
-		item_contained=self.contains[item_name]
+		
+		item_name=self.contains.name
+		item_contained=self.contains
 		item_obj={item_name:item_contained}
 
 		if self.is_open:
 			item_contained.location=None
-			self.location.remove_item(item_name)
-			print(self.interaction.replace('open','close')[:20],end='.\n')
+			self.location.remove_item(self.contains)
+			lib.pretty_print(self.interaction.replace('open','close')[:21],end=".\n")
 		else:
-			print(self.interaction)
-			self.location.add_item(item_obj)
+			lib.pretty_print(self.interaction)
+			self.location.add_item(self.contains)
 			item_contained.location=self.location
+
 		self.is_open = not self.is_open
 
 
-	def get_item(self):
-		if is_open:
-			print("You pick up the {} and start to read it.\n{}".format(self.contains.name,self.contains.desc))
+	def get_item(self,player=None):
+		
+		if self.is_open:
+			lib.pretty_print("You pick up the {} and start to read it.\n{}".format(self.contains.name,self.contains.desc))
 
 
 class Player:
@@ -121,10 +127,11 @@ class Player:
 		self.location=room
 
 	def move(self,movement,current_room):
+		
 		exits=current_room.exits
 #		selected_move = ( movement or movement[0:1] in self.location.exits.get(movement,None))
 		if movement is None:
-			print("None given.")
+			lib.pretty_print("None given.")
 		elif movement in exits:
 			selected_move=exits.get(movement,None)
 		elif movement[0:1] in exits:
@@ -135,6 +142,7 @@ class Player:
 		if  selected_move:
 			self.location=selected_move
 		else:
+			lib.pretty_print("The move you entered is invalid");
 			return None
 
 	def damaged(amount):
@@ -150,14 +158,16 @@ class Inventory:
 		self.items.append(item)
 
 	def show(self):
+		
 		for item in self.items:
-			print(item._id.desc)
+			lib.pretty_print(item._id.desc)
 
 	def use(self,item):
+		
 		if item in items:
-			print(item.interaction)
+			lib.pretty_print(item.interaction)
 		else:
-			print("You don't have that item")
+			lib.pretty_print("You don't have that item")
 
 class Room:
 	desc="You're in a room"
@@ -178,13 +188,21 @@ class Room:
 		Room._id+=1
 
 	def add_item(self,item):
-		self.items.update(item)
+		if self.items is None:
+			self.items={}
+			self.items.update({item.name:item})
+		else:
+			self.items.update({item.name:item})
+	#	self.items.update(item)
+	def remove_item(self,items):
+		self.items.pop(items.name)
 
-	def remove_item(self,item):
-		self.items.pop(item)
-
-	def add_mobs(self,mobs):
-		self.mobs=mobs
+	def add_mobs(self,mob):
+		if self.mobs is None:
+			self.mobs={}
+			self.mobs={mob.name:mob}
+		else:
+			self.mobs.append({mob.name:mob})
 
 	def add_moves(self,moves=exits):
 		self.exits=moves
@@ -193,21 +211,33 @@ class Room:
 class Mob:
 	_id = 0
 	desc="You can't discern anything about it."
-	interact="It just looks at you."
+	interaction="It just looks at you."
 	room=None
 	alive=True
 	name='None'
 	hp=5
 	grab="It's too large to fit in your pocket."
-	def __init__(self,desc=desc,interact=interact,alive=alive,name=name,hp=hp,grab=grab):
+	def __init__(self,desc=desc,interaction=interaction,alive=alive,name=name,hp=hp,grab=grab):
 		self.name=name
 		self.desc=desc
-		self.interact=interact
+		self.interaction=interaction
 		self._id=Mob._id
+		self.grab=grab
 		Mob._id+=1
 		self.alive=alive
 		self.hp=hp
 
+	def interact(self):
+		
+		lib.pretty_print(self.interaction)
+
+	def grab(self):
+		
+		lib.pretty_print(self.grab_desc)
+
 class Grue(Mob):
 	def __init__(self):
-		super().__init__(desc='A giant grue stands before you',interact='You were eaten by a grue',name='Grue',hp=10)
+		super().__init__(desc='A giant grue stands before you',interaction='You were eaten by a grue',name='Grue',hp=10)
+
+
+
