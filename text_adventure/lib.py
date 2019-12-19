@@ -109,8 +109,19 @@ def look(obj,player):
 	if nothing_to_see:
 		pretty_print("There is nothing to see here")
 
-
+# This will format the output and also add coloring. Plus it'll give shorthands for various control characters.
+# There will be another function that replaces the "control" characters with the actual escape codes.
+# \{b} = Bold. \{u}=Underline. \{i}=Italic. \{o}=Clear formatting.
+# Combining them is done similarly. \{b;u}=bold and underlined.
+# All of these codes will be replaced via the actual control codes.
+# Bold = \033[1m
+# Underline = \033[2m
+# TODO: Actually do this as right now formatter is using nonprintable characters in it's calculations.
 def pretty_print(string,end='\n'):
+	#this will soon do a custom formatting system.
+	#to keep the number of extra characters to a minimum. It will use escape characters.
+	#the format will be \b=\033[1m \o=\033[0m. \u=\033[2m etc. The basic formatting will be using
+	#these commands to make format work better.
 	#For some reason we cannot use the real width length. So I am adding up to 5 for the length.
 	#this module will get the me the terminal size and I only need the width as that's all that matters.
 	max_width=get_terminal_size()[0]
