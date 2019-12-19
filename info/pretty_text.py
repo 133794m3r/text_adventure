@@ -58,9 +58,11 @@ def test_colors():
 	}
 	i=0;
 	for key in colors:
-		print('Color {} '.format(key))
+		print("="*80)
+		print('Color {} '.format(key),end='    ')
 		print('Foreground Code: {} Background Code: {}'.format(codes[key]['fg'],codes[key]['bg']))
 		print('Foreground {}color{} Background {}color{}'.format(colors[key]['fg'],clear,colors[key]['bg'],clear))
+#		print("="*80)
 		#print('code:\\033[{}m {} Background {} color {}'.format(i,key,colors[key]['bg'],clear),end='\n')
 		i+=1
 	print("")
