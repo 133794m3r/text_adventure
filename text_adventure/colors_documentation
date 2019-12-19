@@ -6,6 +6,7 @@ So for bold would be \033[1m.
 0 = Normal/Clear/Reset All
 1 = Bold
 2 = Dim
+3 = Italic
 4 = Underlined
 5 = Blinking
 7 = Reversed(Invert colors)
