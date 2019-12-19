@@ -62,11 +62,8 @@ def test_colors():
 		print('Color {} '.format(key),end='    ')
 		print('Foreground Code: {} Background Code: {}'.format(codes[key]['fg'],codes[key]['bg']))
 		print('Foreground {}color{} Background {}color{}'.format(colors[key]['fg'],clear,colors[key]['bg'],clear))
-#		print("="*80)
-		#print('code:\\033[{}m {} Background {} color {}'.format(i,key,colors[key]['bg'],clear),end='\n')
 		i+=1
 	print("")
-	pass
 print("The code below will give you the escape codes to utilize for the formats.\nThey are used like thus {code}String_to_Format{clear_code}\n")
 test_formatting()
 test_colors()
