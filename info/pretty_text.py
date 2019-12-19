@@ -9,6 +9,7 @@ def test_formatting():
 	formatters={'bold':'\033[1m','dim':'\033[2m','italic':'\033[3m','underline':'\033[4m','blinking':'\033[5m','inverted':'\033[7m','hidden':'\033[8m'}
 	for key in formatters:
 		string='code:\\033[{}m {} {}text{}'.format(i,key,formatters[key],clear)
+		#end is python3 to make it run on python2 simply change this line to remove the ,end='    '
 		print(string,end='    ')
 		if i % 2:
 			print("")
