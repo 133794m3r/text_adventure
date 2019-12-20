@@ -115,21 +115,21 @@ def look(obj,player):
 # this should be a single RegEX that replaces based upon the capture groups that are matched.
 # but for now this will work. It's highly ineffecient but oh well.
 def pretty_format(string):
-	output_string=re.sub(r'\\{([u|b|i];)(?!\1)([u|b|i];)(?!\2)([u|b|i])\}',r'\033[1;3;4m',string)
-	output_string=re.sub(r'\\{([u|b];)(?!\1)[u|b]\}',r'\033[1;4m',output_string)
-	output_string=re.sub(r'\\{([u|i];)(?!\1)[u|i]\}',r'\033[3;4m',output_string)
-	output_string=re.sub(r'\\{([b|i];)(?!\1)[b|i]\}',r'\033[1;3m',output_string)
-	output_string=re.sub(r'\\{b}',r'\033[1m',output_string)
-	output_string=re.sub(r'\\{u}',r'\033[4m',output_string)
-	output_string=re.sub(r'\\{i}',r'\033[3m',output_string)
-	output_string=re.sub(r'\\{o}',r'\033[0m',output_string)
+	output_string=re.sub(r'\\\[([u|b|i];)(?!\1)([u|b|i];)(?!\2)([u|b|i])\]',r'\033[1;3;4m',string)
+	output_string=re.sub(r'\\\[([u|b];)(?!\1)[u|b]\]',r'\033[1;4m',output_string)
+	output_string=re.sub(r'\\\[([u|i];)(?!\1)[u|i]\]',r'\033[3;4m',output_string)
+	output_string=re.sub(r'\\\[([b|i];)(?!\1)[b|i]\]',r'\033[1;3m',output_string)
+	output_string=re.sub(r'\\\[b]',r'\033[1m',output_string)
+	output_string=re.sub(r'\\\[u]',r'\033[4m',output_string)
+	output_string=re.sub(r'\\\[i]',r'\033[3m',output_string)
+	output_string=re.sub(r'\\\[o]',r'\033[0m',output_string)
 
 	return output_string;
 
 
 # This will format the output and also add coloring. Plus it'll give shorthands for various control characters.
 # There will be another function that replaces the "control" characters with the actual escape codes.
-# \{b} = Bold. \{u}=Underline. \{i}=Italic. \{o}=Clear formatting.
+# \[b] = Bold. \{u}=Underline. \[i]=Italic. \[o]=Clear formatting.
 # Combining them is done similarly. \{b;u}=bold and underlined.
 # All of these codes will be replaced via the actual control codes.
 # Bold = \033[1m
