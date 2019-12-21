@@ -1,4 +1,3 @@
-
 #!/usr/bin/python3
 '''
 Basic Text Adventure in Python
@@ -37,13 +36,14 @@ class Item:
 		Item._id+=1
 	#this method takes the item from the game world into the user's inventory.
 	def get_item(self,player):
-		
+
 		#we call the move location method and tell it to put it into the player's inventory so that it's
 		#no longer in the game world.
 		if self.location != -1:
-			move_location(self,-1)
-			player.add_item({self.name:self})
-			lib.pretty_print("You have grabbed {} and put it into your \033[1minventory".format(self.name))
+			self.move_location(-1)
+			print(self)
+			player.inventory.add(self)
+			lib.pretty_print("You have grabbed \[b]{}\[o] and put it into your \[b]inventory.\[o]".format(self.name))
 		elif self.location is None:
 			lib.pretty_print("This item doesn't exist")
 		elif self.location == -1:
@@ -85,7 +85,7 @@ class Mailbox(Item):
 		self.contains=contains
 
 	def interact(self):
-		
+
 		item_name=self.contains.name
 		item_contained=self.contains
 		item_obj={item_name:item_contained}
@@ -103,7 +103,7 @@ class Mailbox(Item):
 
 
 	def get_item(self,player=None):
-		
+
 		if self.is_open:
 			lib.pretty_print("You pick up the {} and start to read it.\n{}".format(self.contains.name,self.contains.desc))
 
@@ -155,19 +155,22 @@ class Inventory:
 		self.items=items
 
 	def add(self,item):
-		self.items.append(item)
+		self.items.update({item.name:item})
 
 	def show(self):
-		
+
 		for item in self.items:
-			lib.pretty_print(item._id.desc)
+			lib.pretty_print(self.items[item].desc)
 
 	def use(self,item):
-		
+
 		if item in items:
 			lib.pretty_print(item.interaction)
 		else:
 			lib.pretty_print("You don't have that item")
+
+	def remove(self,item):
+		self.items.pop(item.name,None)
 
 class Room:
 	desc="You're in a room"
@@ -195,7 +198,7 @@ class Room:
 			self.items.update({item.name:item})
 	#	self.items.update(item)
 	def remove_item(self,items):
-		self.items.pop(items.name)
+		self.items.pop(items.name,None)
 
 	def add_mobs(self,mob):
 		if self.mobs is None:

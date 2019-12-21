@@ -12,7 +12,7 @@ from templates import *
 letter=Item()
 letter.desc="It's a letter you found in the mailbox."
 letter.name="letter"
-letter.interaction="The letters have faded but you can make out a single sentence \{b;i;u}'Those in the dark, are always fearul of the light.'\[o]"
+letter.interaction="The letters have faded but you can make out a single sentence \[b;i;u]'Those in the dark, are always fearul of the light.'\[o]"
 mailbox=Mailbox()
 mailbox.desc='It is a mailbox with the flag up and the front is closed.'
 mailbox.contains=letter

@@ -33,8 +33,8 @@ directions=['north','south','west','east']
 # rooms={0:{'items':'Mailbox','mobs':None,'desc':'You are in a room with four exits \033[1m north east south west\033[0m. There is a single mailbox before you.'},1:{'items':None,'mobs':'grue','desc':'dark, and you were eaten by a grue'},2:{'items':'flashlight','mobs':None,'desc':'You are in a room with a single source of light. A \033[1m flashlight.\033[0m'},3:{'item':'Rope','enemy':'fish','desc':'You are in a wet room. There is a fish flopping on the ground before you.'},4:{'items':None,'mobs':None,'desc':'You are in an empty room. You can see nothing else.'}}
 # current_room=0
 print('Enter your name brave traveller.')
-#name=input(prefix)
-name='a';
+name=input(prefix)
+#name='a';
 pretty_print(f'{name} is in a room.')
 pretty_print('Your action verbs are \033[1m{}\033[0m'.format(' '.join(verbs)))
 pretty_print('Your possible movements are \033[1m{}\033[0m'.format(' '.join(directions)))

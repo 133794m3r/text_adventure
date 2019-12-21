@@ -79,8 +79,10 @@ def grab(obj,player):
 				pass
 			elif obj in current_room.items:
 				current_room.items[obj].get_item(player)
+				nothing_to_see=False
 			if current_room.mobs is None:
 				pass
+				nothing_to_see=False
 			elif obj in current_room.mobs:
 				pretty_print(current_room.mobs[obj].grab)
 	if nothing_to_see:
@@ -95,12 +97,15 @@ def look(obj,player):
 		pretty_print(current_room.desc)
 		nothing_to_see=False
 	else:
+		if obj == 'inventory' or obj == 'i':
+			player.inventory.show()
+			nothing_to_see=False
 		if current_room.mobs is None:
 			pass
 		elif obj in current_room.mobs:
 			nothing_to_see=False
 			pretty_print(current_room.mobs[obj].desc)
-			
+
 		if current_room.items is None:
 			pass
 		elif obj in current_room.items:
@@ -129,7 +134,7 @@ def pretty_format(string):
 
 # This will format the output and also add coloring. Plus it'll give shorthands for various control characters.
 # There will be another function that replaces the "control" characters with the actual escape codes.
-# \[b] = Bold. \{u}=Underline. \[i]=Italic. \[o]=Clear formatting.
+# \[b] = Bold. \[u]=Underline. \[i]=Italic. \[o]=Clear formatting.
 # Combining them is done similarly. \{b;u}=bold and underlined.
 # All of these codes will be replaced via the actual control codes.
 # Bold = \033[1m
