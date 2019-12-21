@@ -1,0 +1,12 @@
+The game uses a custom encoding for font stylings. Instead of the normal python methodology I use a different one to make text-wrap work better.
+The method is as follows.
+\033[{MODIFIER}m becomes \[{MODIFIER}]
+Or with a real world example for bold for instance.
+\033[1msomestring becomes \[b]somestring
+This reduces the character count for the modifiers from 7 characters to 4. Normally for this system you'll also be turning off the formatting after a certain word or phrase. So the change is really more.
+So it'd go from
+\033[1msomestring\033[0m => \[b]somestring\[o]
+And the additional character count(the m before the somestring is part of the formatting tokens) goes from 14 to 8. That's 6 characters saved for this string. When doing word-wrapping those 6 characters
+can be the difference between the TextWrap class wrapping the sentence with only a few spaces at the end of the line to one that looks wholely unnatural to look at.
+
+The way this is then converted back is a really hacky-way. I'm using regex to search for those command codes then replace them with the approriate command codes. Then I'm printing the resulting string.
