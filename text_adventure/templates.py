@@ -9,6 +9,15 @@ AGPLv3 or Later
 '''
 import lib
 
+class Buff:
+	name="Nothing"
+	desc="Nothing at all"
+	modifier=None
+	def __init__(self,name=name,desc=desc,modifier=modifier):
+		self.name=name
+		self.desc=desc
+		self.modifer=modifier
+
 # change the location to be player instead of
 # a room id for where the item is. The location will
 # be a signed int. If the item is gone it becomes None meaning
@@ -41,9 +50,10 @@ class Item:
 		#no longer in the game world.
 		if self.location != -1:
 			self.move_location(-1)
-			print(self)
 			player.inventory.add(self)
 			lib.pretty_print("You have grabbed \[b]{}\[o] and put it into your \[b]inventory.\[o]".format(self.name))
+			if hasattr(self,'light'):
+				player.alight=True
 		elif self.location is None:
 			lib.pretty_print("This item doesn't exist")
 		elif self.location == -1:
@@ -103,9 +113,11 @@ class Mailbox(Item):
 
 
 	def get_item(self,player=None):
-
-		if self.is_open:
-			lib.pretty_print("You pick up the {} and start to read it.\n{}".format(self.contains.name,self.contains.desc))
+		if player is None:
+			if self.is_open:
+				lib.pretty_print("You pick up the {} and start to read it.\n{}".format(self.contains.name,self.contains.desc))
+		else:
+			lib.pretty_print("The mailbox is firmly attached to it's post.")
 
 
 class Player:
@@ -116,6 +128,8 @@ class Player:
 	dead=False
 	hp=10
 	inventory=None
+	alight=False
+
 	def __init__(self):
 		self.x=0
 		self.y=0
@@ -123,11 +137,18 @@ class Player:
 		self.dead=False
 		self.location={}
 		self.hp=10
+		self.alight=False
+
+	def add_status(self,buffed):
+		self.status.update({buffed.name,buffed.turns})
+
+	def remove_status(self,buffed):
+		self.status.pop(buffed)
+
 	def transport(self,room):
 		self.location=room
 
 	def move(self,movement,current_room):
-		
 		exits=current_room.exits
 #		selected_move = ( movement or movement[0:1] in self.location.exits.get(movement,None))
 		if movement is None:
@@ -140,6 +161,7 @@ class Player:
 			selected_move=False
 
 		if  selected_move:
+			selected_move.look(self)
 			self.location=selected_move
 		else:
 			lib.pretty_print("The move you entered is invalid");
@@ -180,6 +202,7 @@ class Room:
 	y=0
 	_id=0
 	exits={}
+
 	def __init__(self,desc=desc,items=items,mobs=mobs,x=x,y=y,exits=exits):
 		self.exits=exits
 		self.desc=desc
@@ -196,7 +219,25 @@ class Room:
 			self.items.update({item.name:item})
 		else:
 			self.items.update({item.name:item})
-	#	self.items.update(item)
+
+	def print_exits(self):
+		exits=' '.join(self.exits.keys())
+		exits=exits.replace('n','north')
+		exits=exits.replace('s','south')
+		exits=exits.replace('e','east')
+		exits=exits.replace('w','west')
+		string=""
+		if len(exits) == 4:
+			string="There is a single exit to the \[b]{}\[o].".format(exits)
+		else:
+			string="There are exits to the \[b]{}\[o].".format(exits)
+		lib.pretty_print(string)
+
+	def look(self,player):
+		lib.pretty_print(self.desc)
+#		print(self.exits.keys())
+		self.print_exits()
+
 	def remove_item(self,items):
 		self.items.pop(items.name,None)
 
@@ -210,6 +251,23 @@ class Room:
 	def add_moves(self,moves=exits):
 		self.exits=moves
 
+class Dark_room(Room):
+	desc={'dark':"It's dark and you can see nothing",
+		'light':"You can see the room now."}
+
+	def __init__(self,dark=desc['dark'],light=desc['light']):
+		super().__init__()
+		self.dark=dark
+		self.light=light
+		self.desc='Nothing can be seen.'
+
+	def look(self,player):
+		if player.alight:
+			lib.pretty_print(self.light)
+		else:
+			lib.pretty_print(self.dark)
+				
+		super().print_exits()
 
 class Mob:
 	_id = 0
@@ -231,11 +289,9 @@ class Mob:
 		self.hp=hp
 
 	def interact(self):
-		
 		lib.pretty_print(self.interaction)
 
 	def grab(self):
-		
 		lib.pretty_print(self.grab_desc)
 
 class Grue(Mob):

@@ -35,9 +35,11 @@ directions=['north','south','west','east']
 print('Enter your name brave traveller.')
 name=input(prefix)
 #name='a';
-pretty_print(f'{name} is in a room.')
-pretty_print('Your action verbs are \033[1m{}\033[0m'.format(' '.join(verbs)))
-pretty_print('Your possible movements are \033[1m{}\033[0m'.format(' '.join(directions)))
+pretty_print("Welcome to the world of \[b;i]Adventure\[o].\nBut before we begin first a brief tutorial on how this world works. In this world you will be tasked discovering it's secrets. The parser is your interface to this game world. It will accept commands in the following input.\n \[b]{VERB} {OBJECT}\[o]. An example is given below. To move north you'd type into the prompt denoted by > \n> move north\n It also supports shorthand for movements so move n also works. Your verbs are given at the start. Anything you can interact with via a verb will be \[b]bolded\[o].\n You also have an inventory you can utilize. It is accessed via \[b]look inventory\[o].")
+
+pretty_print(f'\[b]{name}\[o] finds themselves in the middle of a field.')
+pretty_print('Your action verbs are \[b]{}\[o]'.format(' '.join(verbs)))
+pretty_print('Your possible movements are \[b]{}\[o]'.format(' '.join(directions)))
 
 
 def main_loop():

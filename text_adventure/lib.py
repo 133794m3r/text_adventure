@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 '''
 Basic Text Adventure in Python
 The library file that contains the various functions.
@@ -40,79 +41,96 @@ def check_input(usr_input,player):
 
 def interact(obj,player):
 	current_room=player.location
-	is_none=True
+	is_none=False
+	exsists=False
 	if obj == None:
-		is_none=False
 		pretty_print("You touched the air.\nSurprisingly, nothing happened")
 	else:
 		if current_room.mobs is None:
+			is_none=True
 			pass
 		elif obj in current_room.mobs:
-			is_none=False
+
 			if hasattr(current_room.mobs[obj],'interact'):
 				current_room.mobs[obj].interact()
+				exsists=True
 				pass
 			else:
+				is_none=True
 				pass
 		if current_room.items is None:
+			is_none=True
 			pass
 		elif obj in current_room.items:
 			is_none=False
+			exsists=True
 			if hasattr(current_room.items[obj],'interact'):
 				current_room.items[obj].interact()
 				pass
 			else:
 				pretty_print(current_room.items[obj].interaction)
 				pass
-	if is_none:
+
+	if is_none and not exsists:
 		pretty_print("This action was not valid.")
 
 
 def grab(obj,player):
 	current_room=player.location
 	nothing_to_see=True
-	nothing_str="You flailed your arms around wildly trying to grab the air. Sadly the air got away."
+	second_check=False
+	nothing_string="You flailed your arms around wildly trying to grab the air. Sadly the air got away."
 	if obj == None:
-		pretty_print("You flailed your arms around wildly trying to grab the air. Sadly the air got away.")
+		pass
 	else:
 			if current_room.items is None:
+				nothing_to_see=True
 				pass
 			elif obj in current_room.items:
+				nothing_to_see=False
+				second_check=True
 				current_room.items[obj].get_item(player)
-				nothing_to_see=False
-			if current_room.mobs is None:
-				pass
-				nothing_to_see=False
-			elif obj in current_room.mobs:
-				pretty_print(current_room.mobs[obj].grab)
-	if nothing_to_see:
-		pretty_print(nothing_str)
 
+			if current_room.mobs is None:
+				nothing_to_see=True
+				pass
+			elif obj in current_room.mobs:
+				nothing_to_see=False
+				second_check=True
+				pretty_print(current_room.mobs[obj].grab)
+
+	if nothing_to_see and not second_check:
+		pretty_print(nothing_string)
 
 def look(obj,player):
 #	global player
 	current_room=player.location
 	nothing_to_see=True
+	second_check=False
+
 	if obj is None:
-		pretty_print(current_room.desc)
+		current_room.look(player)
 		nothing_to_see=False
+		second_check=False
 	else:
 		if obj == 'inventory' or obj == 'i':
 			player.inventory.show()
-			nothing_to_see=False
+			second_check=True
+
 		if current_room.mobs is None:
+			nothing_to_see=True
 			pass
 		elif obj in current_room.mobs:
-			nothing_to_see=False
 			pretty_print(current_room.mobs[obj].desc)
+			second_check=True
 
 		if current_room.items is None:
+			nothing_to_see=True
 			pass
 		elif obj in current_room.items:
 			pretty_print(current_room.items[obj].desc)
-			nothing_to_see=False
-
-	if nothing_to_see:
+			second_check=True
+	if nothing_to_see and not second_check:
 		pretty_print("There is nothing to see here")
 
 
@@ -128,7 +146,7 @@ def pretty_format(string):
 	output_string=re.sub(r'\\\[u]',r'\033[4m',output_string)
 	output_string=re.sub(r'\\\[i]',r'\033[3m',output_string)
 	output_string=re.sub(r'\\\[o]',r'\033[0m',output_string)
-
+	#output_string=re.sub(r'\\\[n]',r'\n',output_string)
 	return output_string;
 
 
@@ -147,8 +165,10 @@ def pretty_print(string,end='\n'):
 	#these commands to make format work better.
 	#For some reason we cannot use the real width length. So I am adding up to 5 for the length.
 	#this module will get the me the terminal size and I only need the width as that's all that matters.
-	max_width=get_terminal_size()[0]
+	max_width=(1+get_terminal_size()[0])
 	string=pretty_format(string)
+	string=re.sub(r'\n',r'\\[n\]',string)
 	#I format the string to the maximum width I was given so that I can print it properly.
-	formatted_string=fill(string,width=max_width,break_long_words=False)
+	formatted_string=fill(string,width=max_width)
+	formatted_string=re.sub(r'\\\[n\\]',r'\n',string)
 	print(formatted_string,end=end)

@@ -1,3 +1,4 @@
+#!/usr/bin/python
 '''
 Basic Text Adventure in Python
 Data File
@@ -18,18 +19,19 @@ mailbox.desc='It is a mailbox with the flag up and the front is closed.'
 mailbox.contains=letter
 mailbox.name="mailbox"
 mailbox.interaction="You open the mailbox and see it contains a \[b]letter\[o]"
-starter=Room("You are in a room with four exits \[b] north east south west\[o]. There is a single \[b]mailbox\[o] before you.",{'mailbox':mailbox})
+starter=Room("You are in the middle of a field.\nThere is a single \[b]mailbox\[o] before you.",{'mailbox':mailbox})
 #letter.location=starter._id
 letter.locaton=None
 mailbox.location=starter
-north=Room("You are in a room with a single source of light. There is one exit to the \[b]south\[o]. A \[b] flashlight.\[o]")
-west=Room("You are in a wet room. There is a single exit to the \[b]east\[o]. There is a \[b]fish\[o] flopping on the ground before you.")
-east=Room("You are in an empty room. There is a single exit to the \[b]west\[o]. You can see nothing else")
-south=Room("You are in a dark room.There is a single exit to the \[b]north\[o]. There is nothing that can be seen.")
+north=Room("You are in a room with a single source of light. There is one exit to the \[b]south\[o]. Also, there is a single \[b]flashlight on the ground.\[o]")
+west=Room("You are in a wet room. There is a \[b]fish\[o] flopping on the ground before you.")
+east=Room("You are in an empty room. You can see nothing else.")
+south=Dark_room("You are in a dark room. There is nothing that can be seen.","You are in a dark room. There is a terrifying beast before you a \[b]Grue\[o]")
 flashlight=Item()
 flashlight.desc="A bright flashlight that's still burning bright."
 flashlight.grab_desc="You picked up the flashlight."
 flashlight.interaction="You opened the flashlight and see it still contains batteries."
+flashlight.light=True
 fish=Mob("It's a giant fish.","It's scales are slippery",name="fish")
 fish.grab="It slips easily through your fingers, and slaps you in the face with it's fin."
 fish.name='fish'
@@ -37,7 +39,7 @@ flashlight.location=north
 flashlight.name='flashlight'
 north.add_item(flashlight)
 fish.location=west
-
+grue=Grue()
 west.add_mobs(fish)
 starter.add_moves({'n':north,'e':east,'s':south,'w':west})
 west.add_moves({'e':starter})
