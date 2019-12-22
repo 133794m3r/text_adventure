@@ -32,6 +32,8 @@ def check_input(usr_input,player):
 			grab(obj,player)
 		elif verb == 'interact':
 			interact(obj,player)
+		elif verb == 'help':
+			help(obj)
 		else:
 			pretty_print('Your verb {} is not valid'.format(verb))
 	elif verb == 'exit':
@@ -134,19 +136,52 @@ def look(obj,player):
 	if nothing_to_see and not second_check:
 		pretty_print("There is nothing to see here")
 
+def help(obj=None):
+	if obj is None:
+		pretty_print(''' To play the game you need
+
+'''
 
 # TODO: Make sure that this thing doesn't literally run _all_ regexes at one time. In reality
 # this should be a single RegEX that replaces based upon the capture groups that are matched.
 # but for now this will work. It's highly ineffecient but oh well.
 def pretty_format(string):
+	#bold underlined and italicized.
 	output_string=re.sub(r'\\\[([u|b|i];)(?!\1)([u|b|i];)(?!\2)([u|b|i])\]',r'\033[1;3;4m',string)
+	#bold and underlined.
 	output_string=re.sub(r'\\\[([u|b];)(?!\1)[u|b]\]',r'\033[1;4m',output_string)
+	#underlined and italicized.
 	output_string=re.sub(r'\\\[([u|i];)(?!\1)[u|i]\]',r'\033[3;4m',output_string)
+	#bold and italized
 	output_string=re.sub(r'\\\[([b|i];)(?!\1)[b|i]\]',r'\033[1;3m',output_string)
+	#just bold
 	output_string=re.sub(r'\\\[b]',r'\033[1m',output_string)
+	#just underlined
 	output_string=re.sub(r'\\\[u]',r'\033[4m',output_string)
+	#just italicized
 	output_string=re.sub(r'\\\[i]',r'\033[3m',output_string)
+	#clearing all formatting
 	output_string=re.sub(r'\\\[o]',r'\033[0m',output_string)
+	#Now we will be doing all color modes. They are done seperately from other ones.
+	#and you must know the color codes as I'm keeping this super simple for the regex.
+	#What I'm doing is very complex and requires a coarse in regex to understand but I'll keep it simple.
+	'''
+	First off you need to know how python/regex works. First we're going to look for the following string.
+	PLACEHOLDER is representing some string of characters.
+	1)\[PLACEHOLDER]
+	2)Then we're going to do a positive lookbehind. Making sure the following regex matches.
+		a) We're going to go forward one character and then amke sure that it is what we're expecting.
+		b) [ and only one time.
+	3) Then we're going to make sure that there's a capture group that starts with a number. 
+		a) And contains only numbers or the character ;.
+	4)Next we're going to make a postive lookahead. to make sure that the character ] is matched.
+	5) Then we make sure that the character is there.
+	6) We then replace the string using the capture group that was everything in the string and we ignore all of the characters not inside of the [].
+	7) We place them after the magic token \033[ then put the capture group there followed by 'm'.
+	8) We make this replacement go throughout the whole string till the end. 
+	9) We return the string.
+	'''
+	output_string=re.sub(r"\\\[(?<=\[)(\d.[\d|;]*)(?=\])\]",r"\033[\1m",output_string)
 	#output_string=re.sub(r'\\\[n]',r'\n',output_string)
 	return output_string;
 

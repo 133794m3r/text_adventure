@@ -19,7 +19,7 @@ from  data import *
 
 #def main():
 #	intialize()
-verbs=['look','grab','move','interact']
+verbs=['look','grab','move','interact','help']
 #main()
 prefix='> '
 # room_ids={'starter':0,'north':1,'east':2,'south':3,'west':4}
