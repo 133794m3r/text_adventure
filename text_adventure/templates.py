@@ -233,13 +233,34 @@ class Room:
 			string="There are exits to the \[b]{}\[o].".format(exits)
 		lib.pretty_print(string)
 
+	def print_items(self):
+		if self.items is None:
+			return 1
+		items=self.items.keys()
+		total_items=len(items)
+		items=[ 'a \[b]{}\[o]'.format(item) for item in items ]
+		print(items)
+		if total_items == 0:
+			pass
+		elif total_items == 1:
+			items_fmt=items[0]
+			lib.pretty_print("There is a single {} before you.".format(items_fmt))
+		else:
+			items_fmt='{}, and{}'.format(','.join(items[:-1]),items[total_items-1])			
+			lib.pretty_print("You can see {} before you.".format(items_fmt))
+		return 0
+
 	def look(self,player):
 		lib.pretty_print(self.desc)
 #		print(self.exits.keys())
 		self.print_exits()
+		self.print_items()
 
 	def remove_item(self,items):
 		self.items.pop(items.name,None)
+
+	def remove_mobs(self.mob):
+		self.mobs.pop(mob.name,None)
 
 	def add_mobs(self,mob):
 		if self.mobs is None:
@@ -268,6 +289,7 @@ class Dark_room(Room):
 			lib.pretty_print(self.dark)
 				
 		super().print_exits()
+		super().print_items()
 
 class Mob:
 	_id = 0
