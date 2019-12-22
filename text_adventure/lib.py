@@ -17,6 +17,7 @@ def check_input(usr_input,player):
 	inputs=usr_input.split(' ')
 	verb=inputs[0]
 	current_room=player.location
+	
 	if len(inputs) >= 2:
 		obj=inputs[1]
 	else:
