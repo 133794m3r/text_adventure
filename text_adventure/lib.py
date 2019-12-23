@@ -17,7 +17,7 @@ def check_input(usr_input,player):
 	inputs=usr_input.split(' ')
 	verb=inputs[0]
 	current_room=player.location
-	
+
 	if len(inputs) >= 2:
 		obj=inputs[1]
 	else:
@@ -139,8 +139,7 @@ def look(obj,player):
 def help(obj=None):
 	if obj is None:
 		pretty_print(''' To play the game you need
-
-'''
+''')
 
 # TODO: Make sure that this thing doesn't literally run _all_ regexes at one time. In reality
 # this should be a single RegEX that replaces based upon the capture groups that are matched.
@@ -172,13 +171,13 @@ def pretty_format(string):
 	2)Then we're going to do a positive lookbehind. Making sure the following regex matches.
 		a) We're going to go forward one character and then amke sure that it is what we're expecting.
 		b) [ and only one time.
-	3) Then we're going to make sure that there's a capture group that starts with a number. 
+	3) Then we're going to make sure that there's a capture group that starts with a number.
 		a) And contains only numbers or the character ;.
 	4)Next we're going to make a postive lookahead. to make sure that the character ] is matched.
 	5) Then we make sure that the character is there.
 	6) We then replace the string using the capture group that was everything in the string and we ignore all of the characters not inside of the [].
 	7) We place them after the magic token \033[ then put the capture group there followed by 'm'.
-	8) We make this replacement go throughout the whole string till the end. 
+	8) We make this replacement go throughout the whole string till the end.
 	9) We return the string.
 	'''
 	output_string=re.sub(r"\\\[(?<=\[)(\d.[\d|;]*)(?=\])\]",r"\033[\1m",output_string)

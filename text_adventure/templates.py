@@ -64,6 +64,42 @@ class Item:
 	def move_location(self,location):
 		self.location=location
 
+class Container(Item):
+	contains=None
+	is_open=False
+	def __init__(self,contains=contains):
+		Item.__init__(self)
+		self.contains=contains
+		self.interaction=interaction
+
+	def interact(self):
+		if self.contains != None:
+			item_name=self.contains.name
+			item_contained=self.contains
+
+
+		if self.is_open:
+			self.location.remove_item(self.contains)
+
+			if item_contained.location == -1:
+				self.contains=None
+			else:
+				item_contained.location=None
+
+			self.location.remove_items(self.contains)
+			interaction="You closed the \[b]{}\[o]".format(self.name)
+			lib.pretty_print(interaction)
+
+		else:
+			interaction="You opened the \[b]{}\[o] and you see it contains \[b]{}\[o]".format(self.name,item_name)
+			lib.pretty_print(interaction)
+			if self.contains != None:
+				self.location.add_item(self.contains)
+				item_contained.location=self.location
+
+		self.is_open = not self.is_open
+
+		return 0
 '''
 The weapon class is a child class of the Item class. It extends Item with it's own
 attributes that aren't part of the default item class itself.
@@ -95,24 +131,29 @@ class Mailbox(Item):
 		self.contains=contains
 
 	def interact(self):
-
-		item_name=self.contains.name
-		item_contained=self.contains
-		item_obj={item_name:item_contained}
+		if self.contains != None:
+			item_name=self.contains.name
+			item_contained=self.contains
 
 		if self.is_open:
-			item_contained.location=None
 			self.location.remove_item(self.contains)
+			if item_contained.location == -1:
+				self.contains=None
+			else:
+				item_contained.location=None
+
 			lib.pretty_print(self.interaction.replace('open','close')[:21],end=".\n")
 		else:
 			lib.pretty_print(self.interaction)
-			self.location.add_item(self.contains)
-			item_contained.location=self.location
+			if self.contains != None:
+				self.location.add_item(self.contains)
+				item_contained.location=self.location
 
 		self.is_open = not self.is_open
 
 
 	def get_item(self,player=None):
+		print(player is None)
 		if player is None:
 			if self.is_open:
 				lib.pretty_print("You pick up the {} and start to read it.\n{}".format(self.contains.name,self.contains.desc))
@@ -246,7 +287,7 @@ class Room:
 			items_fmt=items[0]
 			lib.pretty_print("There is a single {} before you.".format(items_fmt))
 		else:
-			items_fmt='{}, and{}'.format(','.join(items[:-1]),items[total_items-1])			
+			items_fmt='{}, and{}'.format(','.join(items[:-1]),items[total_items-1])
 			lib.pretty_print("You can see {} before you.".format(items_fmt))
 		return 0
 
@@ -259,7 +300,7 @@ class Room:
 	def remove_item(self,items):
 		self.items.pop(items.name,None)
 
-	def remove_mobs(self.mob):
+	def remove_mobs(self,mob):
 		self.mobs.pop(mob.name,None)
 
 	def add_mobs(self,mob):
@@ -287,7 +328,7 @@ class Dark_room(Room):
 			lib.pretty_print(self.light)
 		else:
 			lib.pretty_print(self.dark)
-				
+
 		super().print_exits()
 		super().print_items()
 
@@ -319,6 +360,3 @@ class Mob:
 class Grue(Mob):
 	def __init__(self):
 		super().__init__(desc='A giant grue stands before you',interaction='You were eaten by a grue',name='Grue',hp=10)
-
-
-
