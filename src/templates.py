@@ -32,7 +32,7 @@ class Item:
 	interaction=''
 	#the item's current location
 	location=None
-	#the intialization method for the object when it's first created.
+	#the initialization method for the object when it's first created.
 	def __init__(self,desc=desc,interact=interaction,location=location):
 		#self is python's version of this.
 		self.desc=desc
@@ -54,12 +54,16 @@ class Item:
 			lib.pretty_print("You have grabbed \[b]{}\[o] and put it into your \[b]inventory.\[o]".format(self.name))
 			if hasattr(self,'light'):
 				player.alight=True
+			player.location.remove_item(self)
 		elif self.location is None:
 			lib.pretty_print("This item doesn't exist")
 		elif self.location == -1:
 			lib.pretty_print("The item is in your inventory already.")
 		else:
 			lib.pretty_print("There is no item.")
+
+	def look(self):
+		lib.pretty_print(self.desc)
 
 	def move_location(self,location):
 		self.location=location
@@ -131,9 +135,11 @@ class Mailbox(Item):
 		self.contains=contains
 
 	def interact(self):
+		string_to_print=self.interaction
 		if self.contains != None:
 			item_name=self.contains.name
 			item_contained=self.contains
+			string_to_print=string_to_print[:-1]+' and it contains \[b]'+item_name+'\[o].'
 
 		if self.is_open:
 			self.location.remove_item(self.contains)
@@ -141,16 +147,23 @@ class Mailbox(Item):
 				self.contains=None
 			else:
 				item_contained.location=None
-
-			lib.pretty_print(self.interaction.replace('open','close')[:21],end=".\n")
+			lib.pretty_print(string_to_print.replace('open','close')[:21],end=".\n")
 		else:
-			lib.pretty_print(self.interaction)
+			lib.pretty_print(string_to_print)
 			if self.contains != None:
 				self.location.add_item(self.contains)
 				item_contained.location=self.location
 
 		self.is_open = not self.is_open
 
+	def look(self):
+		string_to_print=self.desc
+		if self.is_open:
+			string_to_print=string_to_print.replace('closed','opened')
+			if self.contains != None:
+				string_to_print+=' You can also see that it contains \[b]'+item_name+'\[o].'
+
+		lib.pretty_print(string_to_print)
 
 	def get_item(self,player=None):
 		print(player is None)
@@ -221,7 +234,6 @@ class Inventory:
 		self.items.update({item.name:item})
 
 	def show(self):
-
 		for item in self.items:
 			lib.pretty_print(self.items[item].desc)
 

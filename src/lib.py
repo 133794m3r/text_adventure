@@ -13,7 +13,7 @@ from terminal_size import get_terminal_size
 import re
 
 def check_input(usr_input,player):
-	verbs=['look','grab','move','interact']
+	verbs=['look','grab','move','interact','help']
 	inputs=usr_input.split(' ')
 	verb=inputs[0]
 	current_room=player.location
@@ -33,7 +33,7 @@ def check_input(usr_input,player):
 		elif verb == 'interact':
 			interact(obj,player)
 		elif verb == 'help':
-			help(obj)
+			help(verbs,obj)
 		else:
 			pretty_print('Your verb {} is not valid'.format(verb))
 	elif verb == 'exit':
@@ -119,8 +119,10 @@ def look(obj,player):
 		if obj == 'inventory' or obj == 'i':
 			player.inventory.show()
 			second_check=True
-
-		if current_room.mobs is None:
+		elif obj in player.inventory.items:
+			pretty_print(player.inventory.items[obj].desc)
+			second_check=True
+		elif current_room.mobs is None:
 			nothing_to_see=True
 			pass
 		elif obj in current_room.mobs:
@@ -131,15 +133,21 @@ def look(obj,player):
 			nothing_to_see=True
 			pass
 		elif obj in current_room.items:
-			pretty_print(current_room.items[obj].desc)
+			current_room.items[obj].look()
 			second_check=True
 	if nothing_to_see and not second_check:
 		pretty_print("There is nothing to see here")
 
-def help(obj=None):
+def help(verbs,obj=None):
 	if obj is None:
-		pretty_print(''' To play the game you need
-''')
+		pretty_print('''Welcome to the game. In this game you interact with the game w1orld through a simple parser.
+Anything you can interact with is going to be bolded. In addition to this formatting will tell you what it is.
+You give it commands in the following format. \[b][VERB] [OBJECT]\[o].1
+Where object is what you're interacting with and verb is one of these verbs \[b]"{}"\[o]. If you want help with a specific verb then run this command again like so.
+help [VERB].
+It will tell you more about the verb and how it is used.
+Mobs in the game world are \[u]underlined\[o] in addition to being \[b]bolded\[u].
+'''.format(' '.join(verbs)))
 
 # TODO: Make sure that this thing doesn't literally run _all_ regexes at one time. In reality
 # this should be a single RegEX that replaces based upon the capture groups that are matched.
