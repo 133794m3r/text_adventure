@@ -86,14 +86,13 @@ def grab(obj,player):
 	if obj == None:
 		pass
 	else:
-			if current_room.items is None:
-				nothing_to_see=True
-				pass
-			elif obj in current_room.items:
-				nothing_to_see=False
-				second_check=True
-				current_room.items[obj].get_item(player)
-
+		if current_room.items is None:
+			nothing_to_see=True
+			pass
+		elif obj in current_room.items:
+			nothing_to_see=False
+			second_check=True
+			current_room.items[obj].get_item(player)
 			if current_room.mobs is None:
 				nothing_to_see=True
 				pass
@@ -215,3 +214,6 @@ def pretty_print(string,end='\n'):
 	formatted_string=fill(string,width=max_width)
 	formatted_string=re.sub(r'\\\[n\\]',r'\n',string)
 	print(formatted_string,end=end)
+	
+def fight():
+

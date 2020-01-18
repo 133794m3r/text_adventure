@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 '''
 Basic Text Adventure in Python
 Class Library File
@@ -214,7 +213,7 @@ class Player:
 		else:
 			selected_move=False
 
-		if  selected_move:
+		if selected_move:
 			selected_move.look(self)
 			self.location=selected_move
 		else:
@@ -292,7 +291,6 @@ class Room:
 		items=self.items.keys()
 		total_items=len(items)
 		items=[ 'a \[b]{}\[o]'.format(item) for item in items ]
-		print(items)
 		if total_items == 0:
 			pass
 		elif total_items == 1:
@@ -305,7 +303,6 @@ class Room:
 
 	def look(self,player):
 		lib.pretty_print(self.desc)
-#		print(self.exits.keys())
 		self.print_exits()
 		self.print_items()
 
@@ -328,13 +325,23 @@ class Room:
 class Dark_room(Room):
 	desc={'dark':"It's dark and you can see nothing",
 		'light':"You can see the room now."}
-
+	self.is_dark=True
+	#this will hold the hidden mobs and items
+	#that we'll eventually make public and usable once the room is lit up.
+	self.hidden_mobs={}
+	self.hidden_items={}
+	
 	def __init__(self,dark=desc['dark'],light=desc['light']):
 		super().__init__()
 		self.dark=dark
 		self.light=light
 		self.desc='Nothing can be seen.'
-
+	#Have to make it so that when the room is lit up this attribute is changed, and we add all mobs and items.
+	def light_up(self):
+		global grue
+		self.is_dark=False
+		super().add_mobs(grue)
+	
 	def look(self,player):
 		if player.alight:
 			lib.pretty_print(self.light)
@@ -353,6 +360,7 @@ class Mob:
 	name='None'
 	hp=5
 	grab="It's too large to fit in your pocket."
+	
 	def __init__(self,desc=desc,interaction=interaction,alive=alive,name=name,hp=hp,grab=grab):
 		self.name=name
 		self.desc=desc
@@ -372,3 +380,12 @@ class Mob:
 class Grue(Mob):
 	def __init__(self):
 		super().__init__(desc='A giant grue stands before you',interaction='You were eaten by a grue',name='Grue',hp=10)
+	
+	def interact(self,player):
+		#if the room is lit up we can see everything. By default the grue is always there.
+		#if you have the flashlight and interact with it. It'll tell lyou some information
+		#and then it'll let you shine it in it's eyes causing it run away and break through the wall
+		#thus leading to the victory room.
+		#if you interact with it without a flaslight you'll be eaten.
+		if player.alight:
+			
