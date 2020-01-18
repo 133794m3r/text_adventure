@@ -40,6 +40,7 @@ flashlight.name='flashlight'
 north.add_item(flashlight)
 fish.location=west
 grue=Grue()
+south.add_hidden_mobs(grue)
 west.add_mobs(fish)
 starter.add_moves({'n':north,'e':east,'s':south,'w':west})
 west.add_moves({'e':starter})

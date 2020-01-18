@@ -216,4 +216,4 @@ def pretty_print(string,end='\n'):
 	print(formatted_string,end=end)
 	
 def fight():
-
+	pass
