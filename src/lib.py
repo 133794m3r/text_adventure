@@ -138,7 +138,7 @@ def look(obj,player):
 		if current_room.items is None:
 			nothing_to_see=True
 		#	print("here")
-		elif current_room.items is not None:
+		elif obj in current_room.items:
 			current_room.items[obj].look()
 			second_check = True
 		"""
