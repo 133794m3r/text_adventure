@@ -128,16 +128,19 @@ def look(obj,player):
 		elif obj in player.inventory.items:
 			pretty_print(player.inventory.items[obj].desc)
 			second_check=True
-		elif current_room.mobs is None:
+		if current_room.mobs is None:
 			nothing_to_see=True
-			pass
+
 		elif obj in current_room.mobs:
 			pretty_print(current_room.mobs[obj].desc)
 			second_check=True
 
 		if current_room.items is None:
 			nothing_to_see=True
-			pass
+		#	print("here")
+		elif current_room.items is not None:
+			current_room.items[obj].look()
+			second_check = True
 		"""
 		elif obj in current_room.items:
 			current_room.items[obj].look()

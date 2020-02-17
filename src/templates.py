@@ -6,7 +6,10 @@ Macarthur Inbody
 AGPLv3 or Later
 2019
 '''
-import lib
+try:
+	prettyprint
+except NameError:
+	from lib import *
 
 class Buff:
 	name="Nothing"
@@ -50,19 +53,19 @@ class Item:
 		if self.location != -1:
 			self.move_location(-1)
 			player.inventory.add(self)
-			lib.pretty_print("You have grabbed \[b]{}\[o] and put it into your \[b]inventory.\[o]".format(self.name))
+			'lib.';pretty_print("You have grabbed \[b]{}\[o] and put it into your \[b]inventory.\[o]".format(self.name))
 			if hasattr(self,'light'):
 				player.alight=True
 			player.location.remove_item(self)
 		elif self.location is None:
-			lib.pretty_print("This item doesn't exist")
+			'lib.';pretty_print("This item doesn't exist")
 		elif self.location == -1:
-			lib.pretty_print("The item is in your inventory already.")
+			'lib.';pretty_print("The item is in your inventory already.")
 		else:
-			lib.pretty_print("There is no item.")
+			'lib.';pretty_print("There is no item.")
 
 	def look(self):
-		lib.pretty_print(self.desc)
+		'lib.';pretty_print(self.desc)
 
 	def move_location(self,location):
 		self.location=location
@@ -91,11 +94,11 @@ class Container(Item):
 
 			self.location.remove_items(self.contains)
 			interaction="You closed the \[b]{}\[o]".format(self.name)
-			lib.pretty_print(interaction)
+			'lib.';pretty_print(interaction)
 
 		else:
 			interaction="You opened the \[b]{}\[o] and you see it contains \[b]{}\[o]".format(self.name,item_name)
-			lib.pretty_print(interaction)
+			'lib.';pretty_print(interaction)
 			if self.contains != None:
 				self.location.add_item(self.contains)
 				item_contained.location=self.location
@@ -146,9 +149,9 @@ class Mailbox(Item):
 				self.contains=None
 			else:
 				item_contained.location=None
-			lib.pretty_print(string_to_print.replace('open','close')[:21],end=".\n")
+			'lib.';pretty_print(string_to_print.replace('open','close')[:21],end=".\n")
 		else:
-			lib.pretty_print(string_to_print)
+			'lib.';pretty_print(string_to_print)
 			if self.contains != None:
 				self.location.add_item(self.contains)
 				item_contained.location=self.location
@@ -162,15 +165,15 @@ class Mailbox(Item):
 			if self.contains != None:
 				string_to_print+=' You can also see that it contains \[b]'+item_name+'\[o].'
 
-		lib.pretty_print(string_to_print)
+		'lib.';pretty_print(string_to_print)
 
 	def get_item(self,player=None):
 		print(player is None)
 		if player is None:
 			if self.is_open:
-				lib.pretty_print("You pick up the {} and start to read it.\n{}".format(self.contains.name,self.contains.desc))
+				'lib.';pretty_print("You pick up the {} and start to read it.\n{}".format(self.contains.name,self.contains.desc))
 		else:
-			lib.pretty_print("The mailbox is firmly attached to it's post.")
+			'lib.';pretty_print("The mailbox is firmly attached to it's post.")
 
 
 class Player:
@@ -205,7 +208,7 @@ class Player:
 		exits=current_room.exits
 #		selected_move = ( movement or movement[0:1] in self.location.exits.get(movement,None))
 		if movement is None:
-			lib.pretty_print("None given.")
+			'lib.';pretty_print("None given.")
 		elif movement in exits:
 			selected_move=exits.get(movement,None)
 		elif movement[0:1] in exits:
@@ -217,7 +220,7 @@ class Player:
 			selected_move.look(self)
 			self.location=selected_move
 		else:
-			lib.pretty_print("The move you entered is invalid");
+			'lib.';pretty_print("The move you entered is invalid");
 			return None
 
 	def damaged(amount):
@@ -234,14 +237,14 @@ class Inventory:
 
 	def show(self):
 		for item in self.items:
-			lib.pretty_print(self.items[item].desc)
+			'lib.';pretty_print(self.items[item].desc)
 
 	def use(self,item):
 
 		if item in items:
-			lib.pretty_print(item.interaction)
+			'lib.';pretty_print(item.interaction)
 		else:
-			lib.pretty_print("You don't have that item")
+			'lib.';pretty_print("You don't have that item")
 
 	def remove(self,item):
 		self.items.pop(item.name,None)
@@ -283,7 +286,7 @@ class Room:
 			string="There is a single exit to the \[b]{}\[o].".format(exits)
 		else:
 			string="There are exits to the \[b]{}\[o].".format(exits)
-		lib.pretty_print(string)
+		'lib.';pretty_print(string)
 
 	def print_items(self):
 		if self.items is None:
@@ -295,14 +298,14 @@ class Room:
 			pass
 		elif total_items == 1:
 			items_fmt=items[0]
-			lib.pretty_print("There is a single {} before you.".format(items_fmt))
+			'lib.';pretty_print("There is a single {} before you.".format(items_fmt))
 		else:
 			items_fmt='{}, and{}'.format(','.join(items[:-1]),items[total_items-1])
-			lib.pretty_print("You can see {} before you.".format(items_fmt))
+			'lib.';pretty_print("You can see {} before you.".format(items_fmt))
 		return 0
 
 	def look(self,player):
-		lib.pretty_print(self.desc)
+		'lib.';pretty_print(self.desc)
 		self.print_exits()
 		self.print_items()
 
@@ -349,13 +352,13 @@ class Dark_room(Room):
 	
 	def look(self,player):
 		if player.alight:
-			lib.pretty_print(self.light)
+			'lib.';pretty_print(self.light)
 			if self.hidden_mobs != None and self.mobs == None:
 				super().add_mobs(self.hidden_mobs)
 			if self.hidden_items != None and self.items == None:
 				super().add_items(self.hidden_items)
 		else:
-			lib.pretty_print(self.dark)
+			'lib.';pretty_print(self.dark)
 
 		super().print_exits()
 		super().print_items()
@@ -381,10 +384,10 @@ class Mob:
 		self.hp=hp
 
 	def interact(self):
-		lib.pretty_print(self.interaction)
+		'lib.';pretty_print(self.interaction)
 
 	def grab(self):
-		lib.pretty_print(self.grab_desc)
+		'lib.';pretty_print(self.grab_desc)
 
 class Grue(Mob):
 	def __init__(self):
