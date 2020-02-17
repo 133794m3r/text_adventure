@@ -7,10 +7,17 @@ Macarthur Inbody
 AGPLv3 or Later
 2019
 '''
-from data import *
+#try:
+#	data_defined
+#except NameError:
+#	from data import *
+
 from textwrap import fill
 from terminal_size import get_terminal_size
-import re
+try:
+	re
+except NameError:
+	import re
 
 def check_input(usr_input,player):
 	verbs=['look','grab','move','interact','help']
@@ -131,10 +138,13 @@ def look(obj,player):
 		if current_room.items is None:
 			nothing_to_see=True
 			pass
+		"""
 		elif obj in current_room.items:
 			current_room.items[obj].look()
 			second_check=True
+		"""
 	if nothing_to_see and not second_check:
+		
 		pretty_print("There is nothing to see here")
 
 def help(verbs,obj=None):

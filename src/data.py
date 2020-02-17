@@ -8,7 +8,12 @@ AGPLv3 or Later
 2019
 '''
 
+data_defined=True
+#try:
+#	Item()
+#except:
 from templates import *
+
 
 letter=Item()
 letter.desc="It's a letter you found in the mailbox."
@@ -19,7 +24,7 @@ mailbox.desc='It is a mailbox with the flag up and the lid is closed.'
 mailbox.contains=letter
 mailbox.name="mailbox"
 mailbox.interaction="You open the mailbox."
-starter=Room("You are in the middle of a field.\nThere is a single \[b]mailbox\[o] before you.",{'mailbox':mailbox})
+starter=Room("You are in the middle of a field.",{'mailbox':mailbox})
 #letter.location=starter._id
 letter.locaton=None
 mailbox.location=starter
@@ -40,7 +45,7 @@ flashlight.name='flashlight'
 north.add_item(flashlight)
 fish.location=west
 grue=Grue()
-south.add_hidden_mobs(grue)
+south.add_hidden_mobs([grue])
 west.add_mobs(fish)
 starter.add_moves({'n':north,'e':east,'s':south,'w':west})
 west.add_moves({'e':starter})

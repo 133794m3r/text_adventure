@@ -338,10 +338,12 @@ class Dark_room(Room):
 		self.desc='Nothing can be seen.'
 	
 	def add_hidden_mobs(self,mobs):
+		self.hidden_mobs={}
 		for mob in mobs:
 			self.hidden_mobs.update({mob.name:mob})
 	
 	def add_hidden_items(self,items):
+		self.hidden_items={}
 		for item in items:
 			self.hidden_items.update({item.name:item})
 	
