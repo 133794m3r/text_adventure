@@ -252,17 +252,17 @@ class Inventory:
 class Room:
 	desc="You're in a room"
 	items=None
-	mobs=None
+	mob=None
 	x=0
 	y=0
 	_id=0
 	exits={}
 
-	def __init__(self,desc=desc,items=items,mobs=mobs,x=x,y=y,exits=exits):
+	def __init__(self,desc=desc,items=items,mobs=mob,x=x,y=y,exits=exits):
 		self.exits=exits
 		self.desc=desc
 		self.items=items
-		self.mobs=mobs
+		self.mob=mobs
 		self.x=x
 		self.y=y
 		self._id=Room._id
@@ -294,6 +294,7 @@ class Room:
 		items=self.items.keys()
 		total_items=len(items)
 		items=[ 'a \[b]{}\[o]'.format(item) for item in items ]
+		
 		if total_items == 0:
 			pass
 		elif total_items == 1:
@@ -315,15 +316,23 @@ class Room:
 	def remove_mobs(self,mob):
 		self.mobs.pop(mob.name,None)
 
-	def add_mobs(self,mob):
-		if self.mobs is None:
-			self.mobs={}
-			self.mobs={mob.name:mob}
+	def add_mob(self,mob):
+		if self.mob is None:
+			self.mob={}
+			self.mob={mob.name:mob}
 		else:
-			self.mobs.append({mob.name:mob})
+			self.mobs[mob.name]=mob
 
 	def add_moves(self,moves=exits):
 		self.exits=moves
+	
+	def look_obj(self,obj):
+		if self.mob is None and self.items is None:
+			pretty_print("There is \[b]nothing\[o] here to see.")
+		elif self.mob is not None and obj in self.mob:
+			pretty_print(self.mob[obj].desc)
+		elif self.items is not None and obj in self.items:
+			pretty_print(self.items[obj].desc)	
 
 class Dark_room(Room):
 	desc={'dark':"It's dark and you can see nothing",
@@ -331,7 +340,7 @@ class Dark_room(Room):
 	is_dark=True
 	#this will hold the hidden mobs and items
 	#that we'll eventually make public and usable once the room is lit up.
-	hidden_mobs=None
+	hidden_mob=None
 	hidden_items=None
 	
 	def __init__(self,dark=desc['dark'],light=desc['light']):
@@ -340,10 +349,10 @@ class Dark_room(Room):
 		self.light=light
 		self.desc='Nothing can be seen.'
 	
-	def add_hidden_mobs(self,mobs):
-		self.hidden_mobs={}
-		for mob in mobs:
-			self.hidden_mobs.update({mob.name:mob})
+	def add_hidden_mob(self,mob):
+		self.hidden_mob={}
+		#for mob in mobs:
+		self.hidden_mob[mob.name]=mob
 	
 	def add_hidden_items(self,items):
 		self.hidden_items={}
@@ -353,8 +362,8 @@ class Dark_room(Room):
 	def look(self,player):
 		if player.alight:
 			'lib.';pretty_print(self.light)
-			if self.hidden_mobs != None and self.mobs == None:
-				super().add_mobs(self.hidden_mobs)
+			if self.hidden_mob != None and self.mob == None:
+				super().add_mobs(self.hidden_mob.keys(),self.hidden_mob.values())
 			if self.hidden_items != None and self.items == None:
 				super().add_items(self.hidden_items)
 		else:
@@ -371,14 +380,14 @@ class Mob:
 	alive=True
 	name='None'
 	hp=5
-	grab="It's too large to fit in your pocket."
+	grab_desc="It's too large to fit in your pocket."
 	
-	def __init__(self,desc=desc,interaction=interaction,alive=alive,name=name,hp=hp,grab=grab):
+	def __init__(self,desc=desc,interaction=interaction,alive=alive,name=name,hp=hp,grab_desc=grab):
 		self.name=name
 		self.desc=desc
 		self.interaction=interaction
 		self._id=Mob._id
-		self.grab=grab
+		self.grab_desc=grab
 		Mob._id+=1
 		self.alive=alive
 		self.hp=hp

@@ -38,15 +38,15 @@ flashlight.grab_desc="You picked up the flashlight."
 flashlight.interaction="You opened the flashlight and see it still contains batteries."
 flashlight.light=True
 fish=Mob("It's a giant fish.","It's scales are slippery",name="fish")
-fish.grab="It slips easily through your fingers, and slaps you in the face with it's fin."
+fish.grab_desc="It slips easily through your fingers, and slaps you in the face with it's fin."
 fish.name='fish'
 flashlight.location=north
 flashlight.name='flashlight'
 north.add_item(flashlight)
 fish.location=west
 grue=Grue()
-south.add_hidden_mobs([grue])
-west.add_mobs(fish)
+south.add_hidden_mob(grue)
+west.add_mob(fish)
 starter.add_moves({'n':north,'e':east,'s':south,'w':west})
 west.add_moves({'e':starter})
 east.add_moves({'w':starter})

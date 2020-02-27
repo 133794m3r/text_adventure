@@ -56,13 +56,13 @@ def interact(obj,player):
 	if obj == None:
 		pretty_print("You touched the air.\nSurprisingly, nothing happened")
 	else:
-		if current_room.mobs is None:
+		if current_room.mob is None:
 			is_none=True
 			pass
-		elif obj in current_room.mobs:
+		elif obj in current_room.mob:
 
-			if hasattr(current_room.mobs[obj],'interact'):
-				current_room.mobs[obj].interact()
+			if hasattr(current_room.mob[obj],'interact'):
+				current_room.mob[obj].interact()
 				exsists=True
 				pass
 			else:
@@ -100,13 +100,12 @@ def grab(obj,player):
 			nothing_to_see=False
 			second_check=True
 			current_room.items[obj].get_item(player)
-			if current_room.mobs is None:
-				nothing_to_see=True
-				pass
-			elif obj in current_room.mobs:
-				nothing_to_see=False
-				second_check=True
-				pretty_print(current_room.mobs[obj].grab)
+		if current_room.mob is None:
+			nothing_to_see=True
+		elif obj in current_room.mob:
+			nothing_to_see=False
+			second_check=True
+			current_room.mob[obj].grab()
 
 	if nothing_to_see and not second_check:
 		pretty_print(nothing_string)
@@ -128,11 +127,14 @@ def look(obj,player):
 		elif obj in player.inventory.items:
 			pretty_print(player.inventory.items[obj].desc)
 			second_check=True
-		if current_room.mobs is None:
+		else:
+			current_room.look_obj(obj)
+		'''
+		if current_room.mob is None:
 			nothing_to_see=True
 
-		elif obj in current_room.mobs:
-			pretty_print(current_room.mobs[obj].desc)
+		elif obj in current_room.mob:
+			pretty_print(current_room.mob[obj].desc)
 			second_check=True
 
 		if current_room.items is None:
@@ -149,6 +151,7 @@ def look(obj,player):
 	if nothing_to_see and not second_check:
 		
 		pretty_print("There is nothing to see here")
+		'''
 
 def help(verbs,obj=None):
 	if obj is None:
@@ -160,6 +163,17 @@ help [VERB].
 It will tell you more about the verb and how it is used.
 Mobs in the game world are \[u]underlined\[o] in addition to being \[b]bolded\[u].
 '''.format(' '.join(verbs)))
+	else:
+	#TODO: Actually write some helpful information for each of the verbs but oh well it works for now.
+		pretty_print('''Welcome to the game. In this game you interact with the game w1orld through a simple parser.
+Anything you can interact with is going to be bolded. In addition to this formatting will tell you what it is.
+You give it commands in the following format. \[b][VERB] [OBJECT]\[o].1
+Where object is what you're interacting with and verb is one of these verbs \[b]"{}"\[o]. If you want help with a specific verb then run this command again like so.
+help [VERB].
+It will tell you more about the verb and how it is used.
+Mobs in the game world are \[u]underlined\[o] in addition to being \[b]bolded\[u].
+'''.format(' '.join(verbs)))	
+	
 
 # TODO: Make sure that this thing doesn't literally run _all_ regexes at one time. In reality
 # this should be a single RegEX that replaces based upon the capture groups that are matched.
@@ -201,7 +215,6 @@ def pretty_format(string):
 	9) We return the string.
 	'''
 	output_string=re.sub(r"\\\[(?<=\[)(\d.[\d|;]*)(?=\])\]",r"\033[\1m",output_string)
-	#output_string=re.sub(r'\\\[n]',r'\n',output_string)
 	return output_string;
 
 
