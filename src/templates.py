@@ -7,9 +7,9 @@ AGPLv3 or Later
 2019
 '''
 try:
-	prettyprint
+	lib
 except NameError:
-	from lib import *
+	import lib
 
 class Buff:
 	name="Nothing"
@@ -53,19 +53,19 @@ class Item:
 		if self.location != -1:
 			self.move_location(-1)
 			player.inventory.add(self)
-			'lib.';pretty_print("You have grabbed \[b]{}\[o] and put it into your \[b]inventory.\[o]".format(self.name))
+			lib.pretty_print("You have grabbed \[b]{}\[o] and put it into your \[b]inventory.\[o]".format(self.name))
 			if hasattr(self,'light'):
 				player.alight=True
 			player.location.remove_item(self)
 		elif self.location is None:
-			'lib.';pretty_print("This item doesn't exist")
+			lib.pretty_print("This item doesn't exist")
 		elif self.location == -1:
-			'lib.';pretty_print("The item is in your inventory already.")
+			lib.pretty_print("The item is in your inventory already.")
 		else:
-			'lib.';pretty_print("There is no item.")
+			lib.pretty_print("There is no item.")
 
 	def look(self):
-		'lib.';pretty_print(self.desc)
+		lib.pretty_print(self.desc)
 
 	def move_location(self,location):
 		self.location=location
@@ -94,11 +94,11 @@ class Container(Item):
 
 			self.location.remove_items(self.contains)
 			interaction="You closed the \[b]{}\[o]".format(self.name)
-			'lib.';pretty_print(interaction)
+			lib.pretty_print(interaction)
 
 		else:
 			interaction="You opened the \[b]{}\[o] and you see it contains \[b]{}\[o]".format(self.name,item_name)
-			'lib.';pretty_print(interaction)
+			lib.pretty_print(interaction)
 			if self.contains != None:
 				self.location.add_item(self.contains)
 				item_contained.location=self.location
@@ -149,9 +149,9 @@ class Mailbox(Item):
 				self.contains=None
 			else:
 				item_contained.location=None
-			'lib.';pretty_print(string_to_print.replace('open','close')[:21],end=".\n")
+			lib.pretty_print(string_to_print.replace('open','close')[:21],end=".\n")
 		else:
-			'lib.';pretty_print(string_to_print)
+			lib.pretty_print(string_to_print)
 			if self.contains != None:
 				self.location.add_item(self.contains)
 				item_contained.location=self.location
@@ -165,15 +165,15 @@ class Mailbox(Item):
 			if self.contains != None:
 				string_to_print+=' You can also see that it contains \[b]'+item_name+'\[o].'
 
-		'lib.';pretty_print(string_to_print)
+		lib.pretty_print(string_to_print)
 
 	def get_item(self,player=None):
 		print(player is None)
 		if player is None:
 			if self.is_open:
-				'lib.';pretty_print("You pick up the {} and start to read it.\n{}".format(self.contains.name,self.contains.desc))
+				lib.pretty_print("You pick up the {} and start to read it.\n{}".format(self.contains.name,self.contains.desc))
 		else:
-			'lib.';pretty_print("The mailbox is firmly attached to it's post.")
+			lib.pretty_print("The mailbox is firmly attached to it's post.")
 
 
 class Player:
@@ -208,7 +208,7 @@ class Player:
 		exits=current_room.exits
 #		selected_move = ( movement or movement[0:1] in self.location.exits.get(movement,None))
 		if movement is None:
-			'lib.';pretty_print("None given.")
+			lib.pretty_print("None given.")
 		elif movement in exits:
 			selected_move=exits.get(movement,None)
 		elif movement[0:1] in exits:
@@ -220,7 +220,7 @@ class Player:
 			selected_move.look(self)
 			self.location=selected_move
 		else:
-			'lib.';pretty_print("The move you entered is invalid");
+			lib.pretty_print("The move you entered is invalid");
 			return None
 
 	def damaged(amount):
@@ -237,14 +237,14 @@ class Inventory:
 
 	def show(self):
 		for item in self.items:
-			'lib.';pretty_print(self.items[item].desc)
+			lib.pretty_print(self.items[item].desc)
 
 	def use(self,item):
 
 		if item in items:
-			'lib.';pretty_print(item.interaction)
+			lib.pretty_print(item.interaction)
 		else:
-			'lib.';pretty_print("You don't have that item")
+			lib.pretty_print("You don't have that item")
 
 	def remove(self,item):
 		self.items.pop(item.name,None)
@@ -252,28 +252,34 @@ class Inventory:
 class Room:
 	desc="You're in a room"
 	items=None
-	mob=None
+	mobs=None
 	x=0
 	y=0
 	_id=0
 	exits={}
 
-	def __init__(self,desc=desc,items=items,mobs=mob,x=x,y=y,exits=exits):
+	def __init__(self,desc=desc,items=items,mobs=mobs,x=x,y=y,exits=exits):
 		self.exits=exits
 		self.desc=desc
 		self.items=items
-		self.mob=mobs
+		self.mobs=mobs
 		self.x=x
 		self.y=y
 		self._id=Room._id
 		Room._id+=1
 
-	def add_item(self,item):
+	def add_items(self,items):
 		if self.items is None:
 			self.items={}
-			self.items.update({item.name:item})
+		items_type = type(items).__name__
+		if items_type == 'list':
+			for item in items:
+				self.items[tem.name]=item
+		elif items_type == 'dict':
+			for item_name,item in items.items():
+				self.items[item_name]=item
 		else:
-			self.items.update({item.name:item})
+			self.items[items.name]=items
 
 	def print_exits(self):
 		exits=' '.join(self.exits.keys())
@@ -286,7 +292,7 @@ class Room:
 			string="There is a single exit to the \[b]{}\[o].".format(exits)
 		else:
 			string="There are exits to the \[b]{}\[o].".format(exits)
-		'lib.';pretty_print(string)
+		lib.pretty_print(string)
 
 	def print_items(self):
 		if self.items is None:
@@ -299,14 +305,14 @@ class Room:
 			pass
 		elif total_items == 1:
 			items_fmt=items[0]
-			'lib.';pretty_print("There is a single {} before you.".format(items_fmt))
+			lib.pretty_print("There is a single {} before you.".format(items_fmt))
 		else:
 			items_fmt='{}, and{}'.format(','.join(items[:-1]),items[total_items-1])
-			'lib.';pretty_print("You can see {} before you.".format(items_fmt))
+			lib.pretty_print("You can see {} before you.".format(items_fmt))
 		return 0
 
 	def look(self,player):
-		'lib.';pretty_print(self.desc)
+		lib.pretty_print(self.desc)
 		self.print_exits()
 		self.print_items()
 
@@ -316,23 +322,31 @@ class Room:
 	def remove_mobs(self,mob):
 		self.mobs.pop(mob.name,None)
 
-	def add_mob(self,mob):
-		if self.mob is None:
-			self.mob={}
-			self.mob={mob.name:mob}
+	def add_mobs(self,mobs):
+		if self.mobs is None:
+			self.mobs={}
+		mobs_type=type(mobs).__name__
+		if mobs_type == 'list':			
+			for mob in mobs:
+				self.mobs[mob.name]=mob
+		elif mobs_type == 'dict':
+			for mob_name,mob in mobs.items():
+				self.mobs[mob_name]=mob
 		else:
-			self.mobs[mob.name]=mob
+			self.mobs[mobs.name]=mobs
 
 	def add_moves(self,moves=exits):
 		self.exits=moves
 	
 	def look_obj(self,obj):
-		if self.mob is None and self.items is None:
-			pretty_print("There is \[b]nothing\[o] here to see.")
-		elif self.mob is not None and obj in self.mob:
-			pretty_print(self.mob[obj].desc)
+		if self.mobs is None and self.items is None:
+			lib.pretty_print("There is \[b]nothing\[o] here to see.")
+		elif self.mobs is not None and obj in self.mobs:
+			lib.pretty_print(self.mobs[obj].desc)
 		elif self.items is not None and obj in self.items:
-			pretty_print(self.items[obj].desc)	
+			lib.pretty_print(self.items[obj].desc)	
+		else:
+			lib.pretty_print(f"The \[b]{obj}\[o] doesn't exist or you mistyped it. Check your spelling.")
 
 class Dark_room(Room):
 	desc={'dark':"It's dark and you can see nothing",
@@ -340,7 +354,7 @@ class Dark_room(Room):
 	is_dark=True
 	#this will hold the hidden mobs and items
 	#that we'll eventually make public and usable once the room is lit up.
-	hidden_mob=None
+	hidden_mobs=None
 	hidden_items=None
 	
 	def __init__(self,dark=desc['dark'],light=desc['light']):
@@ -349,25 +363,40 @@ class Dark_room(Room):
 		self.light=light
 		self.desc='Nothing can be seen.'
 	
-	def add_hidden_mob(self,mob):
-		self.hidden_mob={}
-		#for mob in mobs:
-		self.hidden_mob[mob.name]=mob
+	def add_hidden_mobs(self,mobs):
+		self.hidden_mobs={}
+		mobs_type=type(mobs).__name__
+		if mobs_type == 'list':			
+			for mob in mobs:
+				self.hidden_mobs[mob.name]=mob
+		elif mobs_type == 'dict':
+			for mob_name,mob in mobs.items():
+				self.hidden_mobs[mob_name]=mob
+		else:
+			self.hidden_mobs[mobs.name]=mobs
 	
 	def add_hidden_items(self,items):
 		self.hidden_items={}
-		for item in items:
-			self.hidden_items.update({item.name:item})
+		items_type = type(items).__name__
+		if items_type == 'list':
+			for item in items:
+				self.hidden_items[tem.name]=item
+		elif items_type == 'dict':
+			for item_name,item in items.items():
+				self.hidden_items[item_name]=item
+		else:
+			self.hidden_items[items.name]=items
 	
 	def look(self,player):
 		if player.alight:
-			'lib.';pretty_print(self.light)
-			if self.hidden_mob != None and self.mob == None:
-				super().add_mobs(self.hidden_mob.keys(),self.hidden_mob.values())
+			lib.pretty_print(self.light)
+			if self.hidden_mobs != None and self.mobs == None:
+				print(self.hidden_mobs)
+				super().add_mobs(self.hidden_mobs)
 			if self.hidden_items != None and self.items == None:
 				super().add_items(self.hidden_items)
 		else:
-			'lib.';pretty_print(self.dark)
+			lib.pretty_print(self.dark)
 
 		super().print_exits()
 		super().print_items()
@@ -382,21 +411,21 @@ class Mob:
 	hp=5
 	grab_desc="It's too large to fit in your pocket."
 	
-	def __init__(self,desc=desc,interaction=interaction,alive=alive,name=name,hp=hp,grab_desc=grab):
+	def __init__(self,desc=desc,interaction=interaction,alive=alive,name=name,hp=hp,grab_desc=grab_desc):
 		self.name=name
 		self.desc=desc
 		self.interaction=interaction
 		self._id=Mob._id
-		self.grab_desc=grab
+		self.grab_desc=grab_desc
 		Mob._id+=1
 		self.alive=alive
 		self.hp=hp
 
 	def interact(self):
-		'lib.';pretty_print(self.interaction)
+		lib.pretty_print(self.interaction)
 
 	def grab(self):
-		'lib.';pretty_print(self.grab_desc)
+		lib.pretty_print(self.grab_desc)
 
 class Grue(Mob):
 	def __init__(self):

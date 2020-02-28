@@ -91,67 +91,28 @@ def grab(obj,player):
 	second_check=False
 	nothing_string="You flailed your arms around wildly trying to grab the air. Sadly the air got away."
 	if obj == None:
-		pass
-	else:
-		if current_room.items is None:
-			nothing_to_see=True
-			pass
-		elif obj in current_room.items:
-			nothing_to_see=False
-			second_check=True
-			current_room.items[obj].get_item(player)
-		if current_room.mob is None:
-			nothing_to_see=True
-		elif obj in current_room.mob:
-			nothing_to_see=False
-			second_check=True
-			current_room.mob[obj].grab()
-
-	if nothing_to_see and not second_check:
 		pretty_print(nothing_string)
+	else:
+		if current_room.items is not None and obj in current_room.items:
+			current_room.items[obj].get_item(player)
+		elif current_room.mobs is not None and obj in current_room.mobs:
+			current_room.mobs[obj].grab()
+		else:
+			pretty_print(nothing_string)
 
 def look(obj,player):
-#	global player
 	current_room=player.location
-	nothing_to_see=True
-	second_check=False
 
 	if obj is None:
 		current_room.look(player)
-		nothing_to_see=False
-		second_check=False
 	else:
 		if obj == 'inventory' or obj == 'i':
 			player.inventory.show()
-			second_check=True
 		elif obj in player.inventory.items:
 			pretty_print(player.inventory.items[obj].desc)
 			second_check=True
 		else:
 			current_room.look_obj(obj)
-		'''
-		if current_room.mob is None:
-			nothing_to_see=True
-
-		elif obj in current_room.mob:
-			pretty_print(current_room.mob[obj].desc)
-			second_check=True
-
-		if current_room.items is None:
-			nothing_to_see=True
-		#	print("here")
-		elif obj in current_room.items:
-			current_room.items[obj].look()
-			second_check = True
-		"""
-		elif obj in current_room.items:
-			current_room.items[obj].look()
-			second_check=True
-		"""
-	if nothing_to_see and not second_check:
-		
-		pretty_print("There is nothing to see here")
-		'''
 
 def help(verbs,obj=None):
 	if obj is None:

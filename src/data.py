@@ -42,11 +42,11 @@ fish.grab_desc="It slips easily through your fingers, and slaps you in the face 
 fish.name='fish'
 flashlight.location=north
 flashlight.name='flashlight'
-north.add_item(flashlight)
+north.add_items(flashlight)
 fish.location=west
 grue=Grue()
-south.add_hidden_mob(grue)
-west.add_mob(fish)
+south.add_hidden_mobs(grue)
+west.add_mobs(fish)
 starter.add_moves({'n':north,'e':east,'s':south,'w':west})
 west.add_moves({'e':starter})
 east.add_moves({'w':starter})
@@ -55,3 +55,4 @@ north.add_moves({'s':starter})
 player=Player()
 player.transport(starter)
 player.inventory=Inventory()
+player.alight=True
