@@ -153,7 +153,7 @@ class Mailbox(Item):
 		else:
 			lib.pretty_print(string_to_print)
 			if self.contains != None:
-				self.location.add_item(self.contains)
+				self.location.add_items(self.contains)
 				item_contained.location=self.location
 
 		self.is_open = not self.is_open
@@ -236,8 +236,10 @@ class Inventory:
 		self.items.update({item.name:item})
 
 	def show(self):
+		tmp_str='Your inventory contains:'
 		for item in self.items:
-			lib.pretty_print(self.items[item].desc)
+			tmp_str+=f'a \[b]{item}\[o] '
+			lib.pretty_print(tmp_str)
 
 	def use(self,item):
 
@@ -300,7 +302,7 @@ class Room:
 		items=self.items.keys()
 		total_items=len(items)
 		items=[ 'a \[b]{}\[o]'.format(item) for item in items ]
-		
+
 		if total_items == 0:
 			pass
 		elif total_items == 1:
@@ -319,14 +321,14 @@ class Room:
 	def remove_item(self,items):
 		self.items.pop(items.name,None)
 
-	def remove_mobs(self,mob):
+	def remove_mob(self,mob):
 		self.mobs.pop(mob.name,None)
 
 	def add_mobs(self,mobs):
 		if self.mobs is None:
 			self.mobs={}
 		mobs_type=type(mobs).__name__
-		if mobs_type == 'list':			
+		if mobs_type == 'list':
 			for mob in mobs:
 				self.mobs[mob.name]=mob
 		elif mobs_type == 'dict':
@@ -337,14 +339,14 @@ class Room:
 
 	def add_moves(self,moves=exits):
 		self.exits=moves
-	
+
 	def look_obj(self,obj):
 		if self.mobs is None and self.items is None:
 			lib.pretty_print("There is \[b]nothing\[o] here to see.")
 		elif self.mobs is not None and obj in self.mobs:
 			lib.pretty_print(self.mobs[obj].desc)
 		elif self.items is not None and obj in self.items:
-			lib.pretty_print(self.items[obj].desc)	
+			lib.pretty_print(self.items[obj].desc)
 		else:
 			lib.pretty_print(f"The \[b]{obj}\[o] doesn't exist or you mistyped it. Check your spelling.")
 
@@ -356,17 +358,17 @@ class Dark_room(Room):
 	#that we'll eventually make public and usable once the room is lit up.
 	hidden_mobs=None
 	hidden_items=None
-	
+
 	def __init__(self,dark=desc['dark'],light=desc['light']):
 		super().__init__()
 		self.dark=dark
 		self.light=light
 		self.desc='Nothing can be seen.'
-	
+
 	def add_hidden_mobs(self,mobs):
 		self.hidden_mobs={}
 		mobs_type=type(mobs).__name__
-		if mobs_type == 'list':			
+		if mobs_type == 'list':
 			for mob in mobs:
 				self.hidden_mobs[mob.name]=mob
 		elif mobs_type == 'dict':
@@ -374,7 +376,7 @@ class Dark_room(Room):
 				self.hidden_mobs[mob_name]=mob
 		else:
 			self.hidden_mobs[mobs.name]=mobs
-	
+
 	def add_hidden_items(self,items):
 		self.hidden_items={}
 		items_type = type(items).__name__
@@ -386,7 +388,13 @@ class Dark_room(Room):
 				self.hidden_items[item_name]=item
 		else:
 			self.hidden_items[items.name]=items
-	
+
+	def remove_hidden_mob(self,mob):
+		self.hidden_mobs.pop(mob.name)
+
+	def remove_hidden_item(self,item):
+		self.hidden_items.pop(item.name)
+
 	def look(self,player):
 		if player.alight:
 			lib.pretty_print(self.light)
@@ -410,7 +418,7 @@ class Mob:
 	name='None'
 	hp=5
 	grab_desc="It's too large to fit in your pocket."
-	
+
 	def __init__(self,desc=desc,interaction=interaction,alive=alive,name=name,hp=hp,grab_desc=grab_desc):
 		self.name=name
 		self.desc=desc
@@ -430,7 +438,7 @@ class Mob:
 class Grue(Mob):
 	def __init__(self):
 		super().__init__(desc='A teriffying beast stands before you a giant grue',interaction='You were eaten by a grue',name='Grue',hp=10)
-	
+
 	def interact(self,player):
 		#if the room is lit up we can see everything. By default the grue is always there.
 		#if you have the flashlight and interact with it. It'll tell lyou some information
@@ -438,4 +446,9 @@ class Grue(Mob):
 		#thus leading to the victory room.
 		#if you interact with it without a flaslight you'll be eaten.
 		if player.alight:
-			pass
+			lib.pretty_print("The \[b]Grue\[o] stared at the \[b]flashglight\[o]'s glowing beam intently. It then stared at you. You could see the primal fear in its eyes as it ran away into the darkness.")
+			player.location.remove_mob(self)
+			player.location.remove_hidden_mob(self)
+		else:
+			lib.pretty_print("The \[b]Grue\[o] opened it mouth and the last thing you remember is the warmth leaving your body.")
+			player.dead=True

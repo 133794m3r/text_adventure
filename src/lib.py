@@ -13,7 +13,16 @@ AGPLv3 or Later
 #	from data import *
 
 from textwrap import fill
-from terminal_size import get_terminal_size
+def init_terminal():
+	import platform
+	current_os = platform.system()
+	if current_os == 'Windows':
+		import ctypes
+		kernel32 = ctypes.windll.kernel32
+		kernel32.SetConsoleMode(kernel32.GetStdHandle(-11), 7)
+
+
+from os import get_terminal_size
 try:
 	re
 except NameError:
@@ -56,30 +65,18 @@ def interact(obj,player):
 	if obj == None:
 		pretty_print("You touched the air.\nSurprisingly, nothing happened")
 	else:
-		if current_room.mob is None:
-			is_none=True
+		if current_room.mobs is not None and obj in current_room.mobs:
+			current_room.mobs[obj].interact(player)
 			pass
-		elif obj in current_room.mob:
-
-			if hasattr(current_room.mob[obj],'interact'):
-				current_room.mob[obj].interact()
-				exsists=True
-				pass
-			else:
-				is_none=True
-				pass
-		if current_room.items is None:
-			is_none=True
-			pass
-		elif obj in current_room.items:
-			is_none=False
-			exsists=True
+		elif current_room.items is not None and obj in current_room.items:
 			if hasattr(current_room.items[obj],'interact'):
 				current_room.items[obj].interact()
-				pass
 			else:
 				pretty_print(current_room.items[obj].interaction)
-				pass
+		else:
+			pretty_print("You touched the air.\nSurprisingly, nothing happened")
+
+
 
 	if is_none and not exsists:
 		pretty_print("This action was not valid.")
@@ -126,15 +123,19 @@ Mobs in the game world are \[u]underlined\[o] in addition to being \[b]bolded\[u
 '''.format(' '.join(verbs)))
 	else:
 	#TODO: Actually write some helpful information for each of the verbs but oh well it works for now.
-		pretty_print('''Welcome to the game. In this game you interact with the game w1orld through a simple parser.
-Anything you can interact with is going to be bolded. In addition to this formatting will tell you what it is.
-You give it commands in the following format. \[b][VERB] [OBJECT]\[o].1
-Where object is what you're interacting with and verb is one of these verbs \[b]"{}"\[o]. If you want help with a specific verb then run this command again like so.
-help [VERB].
-It will tell you more about the verb and how it is used.
-Mobs in the game world are \[u]underlined\[o] in addition to being \[b]bolded\[u].
-'''.format(' '.join(verbs)))	
-	
+		if obj == 'help':
+			pretty_print('''This command will give you help about the different verbs that you can utilize. The format is \[b]help verb\[o]. Then what you will have to do is select which verb you want to know more about to have the help information printed.
+''')
+		elif obj == 'look':
+			pretty_print('''This command has an optional argument \[b]{OBJECT}\[o]. The "object" is what you want to look at. If you omit it, you will simply look at the room. Anything that you can look at will be bolded. This tells you that it is something important in the flavor text. So for example if you were in a room and you get the following shown as the description of the room. \n"You are in a dark dank room. You see a large \[b]rock\[o] that's emitting a strange light."\nThis means that if you wanted to look at this rock you'd type "look rock" and it'd give you it's description.
+				''')
+		elif obj == 'grab':
+			pass
+		elif obj == 'interact':
+			pass
+		elif obj == 'move':
+			pass
+
 
 # TODO: Make sure that this thing doesn't literally run _all_ regexes at one time. In reality
 # this should be a single RegEX that replaces based upon the capture groups that are matched.
@@ -201,6 +202,6 @@ def pretty_print(string,end='\n'):
 	formatted_string=fill(string,width=max_width)
 	formatted_string=re.sub(r'\\\[n\\]',r'\n',string)
 	print(formatted_string,end=end)
-	
+
 def fight():
 	pass
