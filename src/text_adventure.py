@@ -1,29 +1,24 @@
 #!/usr/bin/python3
-'''
+"""
 Basic Text Adventure in Python
 The Main Game iteself.
 This file contains the main game functions.
 Macarthur Inbody
 AGPLv3 or Later
 2019
-'''
+"""
 
 try:
 	lib
 except NameError:
 	import lib
 
-#from templates import *
+
 import sys
 from  data import *
 
 
-#def intialize():
-#	module_name=globals()['__name__']
-#	module_obj=sys.modules[modname]
 
-#def main():
-#	intialize()
 verbs=['look','grab','move','interact','help']
 
 prefix='> '
@@ -40,11 +35,15 @@ lib.pretty_print('Your possible movements are \[b]{}\[o]'.format(' '.join(direct
 
 
 def main_loop():
-	dead=False
-	while dead == False:
+	gameover: bool=False
+	while not gameover:
 		usr_input=input(prefix)
 		lib.check_input(usr_input,player)
 #		dead=True
-	dead=player.dead
-
+		gameover=player.game_over
+	lib.pretty_print("You have scored {player.score} during your adventure.")
+	if player.dead:
+		lib.pretty_print("You have died. Please try to stay alive longer next time.")
+	else:
+		lib.pretty_print("You have escaped from this twisted world. Though you can feel it's beckoning call to explore it's \[b]world\[o] again. Stay tuned for \[b;o]Adventure 2: The Adventuring\[o]")
 main_loop()
