@@ -36,7 +36,8 @@ def get_terminal_size():
 
 
 
-def check_input(usr_input, player):
+def check_input(usr_input: str, player: object):
+
 	verbs = ['look', 'grab', 'move', 'interact', 'help']
 	inputs = usr_input.split(' ')
 	verb = inputs[0]
@@ -73,6 +74,12 @@ def check_input(usr_input, player):
 
 
 def interact(obj, player):
+	"""
+
+	Args:
+		obj:
+		player:
+	"""
 	current_room = player.location
 	is_none = False
 	exsists = False
@@ -110,6 +117,12 @@ def grab(obj, player):
 
 
 def look(obj, player):
+	"""
+
+	Args:
+		obj:
+		player:
+	"""
 	current_room = player.location
 
 	if obj is None:

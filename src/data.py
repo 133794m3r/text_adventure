@@ -34,8 +34,8 @@ mailbox.location=starter
 north=Room("You are in a room with a single source of light. There is one exit to the \[b]south\[o]. Also, there is a single \[b]flashlight on the ground.\[o]")
 west=Room("You are in a wet room. There is a \[b]fish\[o] flopping on the ground before you.")
 east=Room("You are in an empty room. You can see nothing else.")
-south=Dark_room("You are in a dark room. There is nothing that can be seen.","You are in a dark room. There is a terrifying beast before you a \[b]Grue\[o]")
-endgame=Final_room("You are in the room that appeared after the \[b]Grue\[o] was defeated. Your \[b]flashlight\[o] is burning bright at an intensity unseen before. The room is filled with a blinding light. You cannot see anything. If only there was some way to \[b]turn off\[o] that light source.","You are in the final room. With the \[b]flashlight\[o] turned off, the room is visible. You can finally see what the room contains.")
+south=DarkRoom("You are in a dark room. There is nothing that can be seen.","You are in a dark room. There is a terrifying beast before you a \[b]Grue\[o]")
+endgame=FinalRoom("You are in the room that appeared after the \[b]Grue\[o] was defeated. Your \[b]flashlight\[o] is burning bright at an intensity unseen before. The room is filled with a blinding light. You cannot see anything. If only there was some way to \[b]turn off\[o] that light source.","You are in the final room. With the \[b]flashlight\[o] turned off, the room is visible. You can finally see what the room contains.")
 
 flashlight=Item()
 flashlight.desc="A bright flashlight that's still burning bright."
