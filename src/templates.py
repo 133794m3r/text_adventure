@@ -19,6 +19,7 @@ class Buff:
 		self.modifier=modifier
 	def __repr__(self):
 		return 'Buff(name={!r},desc={!r},modifier={!r}'.format(self.name,self.desc,self.modifier)
+
 # change the location to be player instead of
 # a room id for where the item is. The location will
 # be a signed int. If the item is gone it becomes None meaning
@@ -33,13 +34,15 @@ class Item:
 	interaction=''
 	#the item's current location
 	location=None
+	#If the item can be taken to the inventory.
+	removeable=False
 	"""
 	TODO: Swap this whole thing over to **kwargs and also *args.
 	Basically what I'm going to do is change it from the current version to kwargs and args.
 	"""
 	#the initialization method for the object when it's first created.
 	def __init__(self,*arg,**kwarg):
-		keywords=["desc","name","interaction","location"]
+		keywords=["desc","name","interaction","location","removeable"]
 		if len(arg) > 0:
 			for idx,opt in enumerate(arg):
 				setattr(self,keywords[idx],opt)
@@ -52,7 +55,7 @@ class Item:
 		Item._id+=1
 
 	def __repr__(self):
-		return 'Item(desc={!r},name={!r},interaction={!r},location={!r})'.format(self.desc,self.name,self.interaction,self.location)
+		return 'Item(desc={!r},name={!r},interaction={!r},location={!r})'.format(self.desc,self.name,self.interaction,self.location._id)
 
 	#this method takes the item from the game world into the user's inventory.
 	def get_item(self,player):
@@ -63,8 +66,6 @@ class Item:
 			self.move_location(-1)
 			player.inventory.add(self)
 			lib.pretty_print("You have grabbed \[b]{}\[o] and put it into your \[b]inventory.\[o]".format(self.name))
-			if hasattr(self,'light'):
-				player.alight=True
 			player.location.remove_item(self)
 		elif self.location is None:
 			lib.pretty_print("This item doesn't exist")
@@ -79,6 +80,57 @@ class Item:
 	def move_location(self,location):
 		self.location=location
 
+class Lantern(Item):
+	light=True
+
+	#this method takes the item from the game world into the user's inventory.
+	def get_item(self,player):
+		#we call the move location method and tell it to put it into the player's inventory so that it's
+		#no longer in the game world.
+		if self.location != -1:
+			self.move_location(-1)
+			player.inventory.add(self)
+			lib.pretty_print("You have grabbed \[b]{}\[o] and put it into your \[b]inventory.\[o]".format(self.name))
+			player.alight=True
+			player.location.remove_item(self)
+		elif self.location is None:
+			lib.pretty_print("This item doesn't exist")
+		elif self.location == -1:
+			lib.pretty_print("The item is in your inventory already.")
+		else:
+			lib.pretty_print("There is no item.")
+
+	def use(self):
+		if self.location == -1:
+			player.alight = not player.alight
+
+		if self.light:
+			lib.pretty_print(f"You turned on the {self.name} and a light began to emit from it.")
+		else:
+			lib.pretty_print(f"You turned off the {self.name} and the light slowly faded from it.")
+
+		self.light=not self.light
+
+class MacGuffin(Item):
+	removeable=True
+	score=1000
+	def __init__(self,*arg,**kwarg):
+		keywords=["desc","name","interaction","location","removeable","score"]
+		if len(arg) > 0:
+			for idx,opt in enumerate(arg):
+				setattr(self,keywords[idx],opt)
+		if len(kwarg) > 0:
+			for key,value in kwarg.items():
+				setattr(self,key,value)
+
+		self._id=super()._id
+		#increment the item's id
+		Item._id+=1
+
+	def grab(self,player):
+		player.score+=self.score
+		super().get_item(player)
+		player.game_over=True
 
 class Container(Item):
 	contains=None
@@ -86,7 +138,7 @@ class Container(Item):
 
 	#def __init__(self,contains=contains):
 	def __init__(self,*arg,**kwarg):
-		keywords=["desc","name","interaction","location","contains"]
+		keywords=["desc","name","interaction","location","contains","removeable"]
 
 		if len(arg) > 0:
 			for idx,opt in enumerate(arg):
@@ -94,11 +146,12 @@ class Container(Item):
 		elif len(kwarg) > 0:
 			for key,value in kwarg.items():
 				setattr(self,key,value)
-
+		id=super()._id
+		Item._id+1
 
 
 	def __repr__(self):
-		return 'Container(desc={!r},name={!r},interaction={!r},location={!r},contains={!r})'.format(self.desc,self.name,self.contains,self.interaction,self.location)
+		return 'Container(desc={!r},name={!r},interaction={!r},location={!r},contains={!r})'.format(self.desc,self.name,self.interaction,self.location._id,self.contains.name)
 
 	def interact(self):
 
@@ -143,22 +196,16 @@ class Weapon(Item):
 		super().__init__(desc=desc,interact=interaction,location=location)
 
 
-class World:
-	rooms={}
-	def __init__(self):
-		pass
-	def add_room(self,room):
-		self.rooms[(room.x,room.y)]=room
-
 class Mailbox(Item):
 	contains='letter'
 	is_open=False
+
 	def __init__(self,contains=contains):
 		Item.__init__(self)
 		self.contains=contains
 
 	def __repr__(self):
-		return 'Mailbox(desc={!r},name={!r},location={!r},contains={!r}'.format(self.desc,self.name,self.location,self.coontains)
+		return "Mailbox(desc={!r},name={!r},location={!r},contains={!r}".format(self.desc,self.name,self.location._id,self.contains.name)
 
 	def interact(self):
 		string_to_print=self.interaction
@@ -193,7 +240,6 @@ class Mailbox(Item):
 		lib.pretty_print(string_to_print)
 
 	def get_item(self,player=None):
-		print(player is None)
 		if player is None:
 			if self.is_open:
 				lib.pretty_print("You pick up the {} and start to read it.\n{}".format(self.contains.name,self.contains.desc))
@@ -216,15 +262,15 @@ class Player:
 
 	def __init__(self,*arg,**kwarg):
 		keywords=['x','y','weapon','hp','location','inventory','alight']
-	#def __init__(self,x=x,y=y,weapon=weapon,hp=hp,location=location,inventory=inventory,alight=alight):
 		if len(arg) != 0:
 			for idx,opt in enumerate(arg):
 				setattr(self,keywords[idx],opt)
-		elif len(kwarg) !=0:
+		if len(kwarg) !=0:
 			for k,v in kwarg.items():
 				setattr(self,k,v)
+
 	def __repr__(self):
-			return 'Player(x={!r},y={!r},weapon={!r},hp={!r},location={!r},inventory={!r},alight={!r}'.format(self.x,self.y,self.weapon,self.hp,self.location,self.inventory,self.alight)
+			return 'Player(x={!r},y={!r},weapon={!r},hp={!r},location={!r},inventory={!r},alight={!r}'.format(self.x,self.y,self.weapon,self.hp,self.location._id,self.inventory,self.alight)
 
 	def add_status(self,buffed):
 		self.status.update({buffed.name,buffed.turns})
@@ -235,16 +281,16 @@ class Player:
 	def transport(self,room):
 		self.location=room
 
-	def move(self,movement,current_room):
-		exits=current_room.exits
+	def move(self,movement):
+		exits=self.location.exits
 		selected_move=False
+#		print(movement)
 		if movement is None:
-			lib.pretty_print("None given.")
+			lib.pretty_print("No movement given.")
 		elif movement in exits:
 			selected_move=exits.get(movement,None)
 		elif movement[0:1] in exits:
 			selected_move=exits.get(movement[0:1],None)
-
 
 		if selected_move:
 			self.turns=0
@@ -303,9 +349,10 @@ def room_print_objs(objs: list, total_objs: str, prefix="You can see"):
 		lib.pretty_print(string.format(objs[0]))
 	elif total_objs >= 2:
 		objs = ["\[b]{}\[o]".format(obj) for obj in objs]
-		objs_fmt="{}, and{}".format(','.join(objs[:-1]),items[total_objs-1])
+		objs_fmt="{}, and {}".format(','.join(objs[:-1]),objs[total_objs-1])
 		string=prefix+" {} before you."
 		lib.pretty_print(string.format(objs_fmt))
+
 
 def init_object(obj,args,keywords=None):
 	"""
@@ -313,7 +360,7 @@ def init_object(obj,args,keywords=None):
 	To avoid repeating myself with lots of duplicate code. I'm going to instead 
 	Args:
 		obj (object):The object we're going to be modifying.
-		args (tuple|dict):The arguments we're going to be working with.
+		args (tuple)|(dict):The arguments we're going to be working with.
 		keywords(list): Optional argument. It is the keywords we're going to use. If not specified. We assume they are
 			passing a list.
 
@@ -362,19 +409,22 @@ class Room:
 			self.items[items.name]=items
 
 	def print_exits(self):
-		exits=' '.join(self.exits.keys())
-		exits=exits.replace('n','north')
-		exits=exits.replace('s','south')
-		exits=exits.replace('e','east')
-		exits=exits.replace('w','west')
-		string=""
-
-		if len(exits) == 4:
-			string="There is a single exit to the \[b]{}\[o].".format(exits)
+		if self.exits == {}:
+			lib.pretty_print("There are no \[b]exits\[o]. It seems as though you're trapped in here. There must be some other way out.")
 		else:
-			string="There are exits to the \[b]{}\[o].".format(exits)
+			exits=' '.join(self.exits.keys())
+			exits=exits.replace('n','north')
+			exits=exits.replace('s','south')
+			exits=exits.replace('e','east')
+			exits=exits.replace('w','west')
 
-		lib.pretty_print(string)
+			string=""
+			if len(exits) == 4:
+				string="There is a single exit to the \[b]{}\[o].".format(exits)
+			else:
+				string="There are exits to the \[b]{}\[o].".format(exits)
+
+			lib.pretty_print(string)
 
 	def print_mobs(self):
 		if self.mobs is not None:
@@ -415,8 +465,12 @@ class Room:
 		else:
 			self.mobs[mobs.name]=mobs
 
-	def add_moves(self,moves):
-		self.exits=moves
+	def add_moves(self,exits):
+		#for k in self.exits.keys():
+			#print(k)
+		for k,v in exits.items():
+			self.exits[k]=v
+		#self.exits=e
 
 	def look_obj(self,obj):
 		if self.mobs is None and self.items is None:
@@ -436,18 +490,22 @@ class DarkRoom(Room):
 	#that we'll eventually make public and usable once the room is lit up.
 	hidden_mobs=None
 	hidden_items=None
+	hidden_exits=None
 
 	def __init__(self,dark=dark,light=light,*kwargs):
-		super().__init__()
+		#super().__init__()
 		self.dark=dark
 		self.light=light
 		self.desc='Nothing can be seen.'
+		_id=Room._id
+		Room._id+=1
 
 	def __repr__(self):
 		return 'DarkRoom(dark={!r},light={!r},items={!r},mobs={!r},x={!r},y={!r},exits={!r},hidden_mobs={!r},hidden_items={!r}'.format(self.dark,self.light,self.items,self.mobs,self.x,self.y,self.exits,self.hidden_mobs,self.hidden_items)
 
 	def add_hidden_mobs(self,mobs):
-		self.hidden_mobs={}
+		if self.hidden_mobs is None:
+			self.hidden_mobs={}
 		mobs_type=type(mobs).__name__
 		if mobs_type == 'list':
 			for mob in mobs:
@@ -459,7 +517,8 @@ class DarkRoom(Room):
 			self.hidden_mobs[mobs.name]=mobs
 
 	def add_hidden_items(self,items):
-		self.hidden_items={}
+		if self.hidden_items is None:
+			self.hidden_items={}
 		items_type = type(items).__name__
 		if items_type == 'list':
 			for item in items:
@@ -470,11 +529,19 @@ class DarkRoom(Room):
 		else:
 			self.hidden_items[items.name]=items
 
+	def add_hidden_exits(self,exits):
+		if self.hidden_exits is None:
+			self.hidden_exits={}
+		for k,v in exits.items():
+			self.hidden_exits[k]=v
+
 	def remove_hidden_mob(self,mob):
-		self.hidden_mobs.pop(mob.name,None)
+		if self.hidden_mobs is not None:
+			self.hidden_mobs.pop(mob.name,None)
 
 	def remove_hidden_item(self,item):
-		self.hidden_items.pop(item.name,None)
+		if self.hdiden_items is not None:
+			self.hidden_items.pop(item.name,None)
 
 	def print_mobs(self):
 		if self.mobs is None:
@@ -487,17 +554,16 @@ class DarkRoom(Room):
 		if self.items is None:
 			return 1
 		items=list(self.items.keys())
+		#print(items)
 		total_items=len(items)
 		room_print_objs(items, total_items)
 		return 0
 
 	def look(self,player):
 		if player.alight:
-			lib.pretty_print(self.light)
 			if self.hidden_mobs is not None and self.mobs is None:
-				print(self.hidden_mobs)
 				super().add_mobs(self.hidden_mobs)
-			if self.hidden_items is not None and self.items is None:
+			if self.hidden_items is not None:
 				super().add_items(self.hidden_items)
 			super().print_mobs()
 		else:
@@ -505,7 +571,7 @@ class DarkRoom(Room):
 			self.print_mobs()
 
 		super().print_exits()
-		super().print_items()
+		self.print_items()
 
 class FinalRoom(DarkRoom):
 	wait_condition='dark'
@@ -522,36 +588,49 @@ class FinalRoom(DarkRoom):
 
 	def wait(self,player):
 		if self.wait_condition == 'dark':
-			if player.alight:
+			if not player.alight and self.macguffin is None:
 				super().add_items(macguffin)
-				pass
-			else:
+			elif macguffin in player.inventory:
 				pass
 		else:
 			pass
+
+class World:
+	rooms={}
+	def __init__(self):
+		pass
+	def add_room(self,room):
+		self.rooms[(room.x,room.y)]=room
 
 class Mob:
 	_id = 0
 	desc="You can't discern anything about it."
 	interaction="It just looks at you."
-	room=None
+	location=None
 	alive=True
 	name='None'
 	hp=5
 	grab_desc="It's too large to fit in your pocket."
 
-	def __init__(self,desc=desc,interaction=interaction,alive=alive,name=name,hp=hp,grab_desc=grab_desc):
-	#def __init__(self,*args,**kwargs):
-		keywords=['desc','interaction','alive','name','hp','grab_desc']
+	#def __init__(self,desc=desc,interaction=interaction,alive=alive,name=name,hp=hp,grab_desc=grab_desc):
+	def __init__(self,*args,**kwargs):
+		keywords=['desc','interaction','location','alive','name','hp','grab_desc']
+		if len(args) != 0:
+			for idx, opt in enumerate(args):
+				setattr(self, keywords[idx], opt)
+		if len(kwargs) != 0:
+			for k, v in kwargs.items():
+				setattr(self, k, v)
 
-		self.name=name
-		self.desc=desc
-		self.interaction=interaction
-		self._id=Mob._id
-		self.grab_desc=grab_desc
+		#
+		# self.name=name
+		# self.desc=desc
+		# self.interaction=interaction
+		# self._id=Mob._id
+		# self.grab_desc=grab_desc
 		Mob._id+=1
-		self.alive=alive
-		self.hp=hp
+		# self.alive=alive
+		# self.hp=hp
 
 	def __repr__(self):
 		return 'Mob(desc={!r},interaction={!r},alive={!r},name={!r},hp={!r},grab_desc={!r}'.format(self.desc,self.interaction,self.alive,self.name,self.hp,self.grab_desc)
@@ -562,10 +641,11 @@ class Mob:
 	def grab(self):
 		lib.pretty_print(self.grab_desc)
 
-
 class Grue(Mob):
-	def __init__(self):
-		super().__init__(desc='A teriffying beast stands before you a giant grue',interaction='You were eaten by a grue',name='Grue',hp=10)
+	desc='A teriffying beast stands before you a giant grue.'
+	interaction='You were eaten by a grue.'
+	name='grue'
+	hp=10
 
 	def interact(self,player):
 		#if the room is lit up we can see everything. By default the grue is always there.
@@ -574,9 +654,10 @@ class Grue(Mob):
 		#thus leading to the victory room.
 		#if you interact with it without a flaslight you'll be eaten.
 		if player.alight:
-			lib.pretty_print("The \[b]Grue\[o] stared at the \[b]flashglight\[o]'s glowing beam intently. It then stared at you. You could see the primal fear in its eyes as it ran away into the darkness.")
+			lib.pretty_print("The \[b]Grue\[o] stared at the \[b]flashglight\[o]'s glowing beam intently. It then stared at you. You could see the primal fear in its eyes as it ran away into the darkness.... Then a bright light appeared before you with a new exit from this area. It beckons you to come.")
 			player.location.remove_mob(self)
 			player.location.remove_hidden_mob(self)
+			player.location.add_moves(player.location.hidden_exits)
 		else:
 			lib.pretty_print("The \[b]Grue\[o] opened it mouth and the last thing you remember is the warmth leaving your body.")
 			player.dead=True

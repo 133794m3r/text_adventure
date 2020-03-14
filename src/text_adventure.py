@@ -37,7 +37,7 @@ lib.pretty_print('Your possible movements are \[b]{}\[o]'.format(' '.join(direct
 def main_loop():
 	gameover: bool=False
 	while not gameover:
-		usr_input=input(prefix)
+		usr_input=input(prefix).lower()
 		lib.check_input(usr_input,player)
 #		dead=True
 		gameover=player.game_over

@@ -32,14 +32,48 @@ def get_terminal_size():
 		return get_terminal_size()
 
 
+def debug(obj,player):
+	current_room=player.location
+	if obj is None:
+		print(current_room)
+	elif current_room.items is not None and obj in current_room.items:
+		print(current_room.items[obj])
+	elif current_room.mobs is not None and obj in current_room.mobs:
+		print(current_room.mobs[obj])
+	elif current_room.exits is not None and obj in current_room.exits:
+		print(current_room.exits[obj])
+	elif obj in player.inventory.items:
+		print(player.inventory.items[obj])
+	elif obj in ('Player','player'):
+		print(player)
+	else:
+		print(f"Your object {obj} wasn't found.")
 
-
-
+def use(obj,player):
+	curren_room=player.location
+	if obj in current_room.items:
+		if has_attr(current_room.items[obj],'use'):
+			current_room.items[obj].use(player)
+		else:
+			pretty_print(f"You can't use {obj}")
+	elif obj in player.inventory.items:
+		if has_attr(current_room.mobs[obj],'use'):
+			current_room.mobs[obj].use(player)
+		else:
+			pretty_print(f"You can't use {obj}")
+	else:
+		pretty_print(f"You can't use {obj}")
 
 def check_input(usr_input: str, player: object):
-
+	"""
+	Check input function. It will parse the user's input and perform the corresponding action so long as it was valid.
+	Args:
+		usr_input: The string that was passed to us from the main function.
+		player: The global player object.
+	"""
 	verbs = ['look', 'grab', 'move', 'interact', 'help']
 	inputs = usr_input.split(' ')
+	movements = ["north","south","east","west","n","s","e","w"]
 	verb = inputs[0]
 	current_room = player.location
 
@@ -48,29 +82,34 @@ def check_input(usr_input: str, player: object):
 	else:
 		obj = None
 
-	if verb in verbs:
-		if verb == 'move':
-			player.move(obj, current_room)
-		elif verb == 'look':
-			look(obj, player)
-		elif verb == 'grab':
-			grab(obj, player)
-		elif verb == 'interact':
-			interact(obj, player)
-		elif verb == 'help':
-			help(verbs, obj)
-		else:
-			pretty_print('Your verb {} is not valid'.format(verb))
-	elif verb == 'exit':
+	if verb == 'move' and obj in movements:
+		player.move(obj)
+	elif verb in movements:
+		player.move(verb)
+	elif verb in ('look','l'):
+		look(obj, player)
+	elif verb in ('grab','g'):
+		grab(obj, player)
+	elif verb in ('interact','i'):
+		interact(obj, player)
+	elif verb in ('inventory','inv'):
+		player.inventory.show()
+	elif verb in ('help','h'):
+		help(verbs, obj)
+	elif verb in ('use','u'):
+		use(obj,player)
+	elif verb  == 'exit':
 		pretty_print("Thank's for playing. I can't wait to see you again.")
 		exit(0)
-	elif verb == 'wait':
+	elif verb in ('wait','w'):
 		if has_attr(current_room,'wait'):
 			current_room.wait(player)
 		else:
 			pretty_print('No valid input was given.')
+	elif verb in ('debug','d'):
+			debug(obj,player)
 	else:
-		pretty_print('No valid input was given.')
+		pretty_print(f"The verb \[b]{verb}\[o] was no valid or the target of that verb was not valid.")
 
 
 def interact(obj, player):
@@ -92,12 +131,14 @@ def interact(obj, player):
 		if hasattr(current_room.items[obj], 'interact'):
 			current_room.items[obj].interact()
 		else:
-				pretty_print(current_room.items[obj].interaction)
+			pretty_print(current_room.items[obj].interaction)
+	elif obj in player.inventory.items:
+		if hasattr(player.inventory.items[obj], 'interact'):
+			player.inventory.items[obj].interact()
+		else:
+			pretty_print(player.inventory.items[obj].interaction)
 	else:
-		pretty_print("You touched the air.\nSurprisingly, nothing happened")
-
-	if is_none and not exsists:
-		pretty_print("This action was not valid.")
+		pretty_print("There was nothing to touch, so you touched the air. Surprisingly nothing happened.")
 
 
 def grab(obj, player):
