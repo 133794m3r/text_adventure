@@ -37,11 +37,11 @@ lib.pretty_print('Your possible movements are \[b]{}\[o]'.format(' '.join(direct
 def main_loop():
 	gameover: bool=False
 	while not gameover:
-		usr_input=input(prefix)
+		usr_input=input(prefix).lower()
 		lib.check_input(usr_input,player)
 #		dead=True
 		gameover=player.game_over
-	lib.pretty_print("You have scored {player.score} during your adventure.")
+	lib.pretty_print(f"You have scored {player.score} during your adventure.")
 	if player.dead:
 		lib.pretty_print("You have died. Please try to stay alive longer next time.")
 	else:
