@@ -78,7 +78,7 @@ def check_input(usr_input: str, player: object):
 	current_room = player.location
 
 	if len(inputs) >= 2:
-		obj = inputs[1]
+		obj = ' '.join(inputs[1:])
 	else:
 		obj = None
 

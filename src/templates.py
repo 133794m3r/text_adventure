@@ -62,7 +62,7 @@ class Item:
 
 		#we call the move location method and tell it to put it into the player's inventory so that it's
 		#no longer in the game world.
-		if self.location != -1:
+		if self.location != -1 and self.removeable == True:
 			self.move_location(-1)
 			player.inventory.add(self)
 			lib.pretty_print("You have grabbed \[b]{}\[o] and put it into your \[b]inventory.\[o]".format(self.name))
@@ -71,6 +71,8 @@ class Item:
 			lib.pretty_print("This item doesn't exist")
 		elif self.location == -1:
 			lib.pretty_print("The item is in your inventory already.")
+		elif self.removeable == False:
+			lib.pretty_print(f"\[b]{self.name}\[o] is firmly attached and wont' budge.")
 		else:
 			lib.pretty_print("There is no item.")
 
@@ -79,6 +81,39 @@ class Item:
 
 	def move_location(self,location):
 		self.location=location
+
+class Treasure(Item):
+	score=0
+	removeable=True
+	def __init__(self,*arg,**kwarg):
+		keywords=["desc","name","interaction","location","removeable","score"]
+		if len(arg) > 0:
+			for idx,opt in enumerate(arg):
+				setattr(self,keywords[idx],opt)
+		if len(kwarg) > 0:
+			for key,value in kwarg.items():
+				setattr(self,key,value)
+
+		self._id=Item._id
+		#increment the item's id
+		Item._id+=1
+
+	def get_item(self,player):
+		#we call the move location method and tell it to put it into the player's inventory so that it's
+		#no longer in the game world.
+		if self.location != -1:
+			self.move_location(-1)
+			player.inventory.add(self)
+			player.score+=self.score
+			lib.pretty_print(f"You have grabbed \[b]{self.name}\[o] and put it into your \[b]inventory's treasure pouch\[o]")
+			player.location.remove_item(self)
+
+		elif self.location is None:
+			lib.pretty_print("This item doesn't exist")
+		elif self.location == -1:
+			lib.pretty_print("The item is in your inventory already.")
+		else:
+			lib.pretty_print("There is no item.")
 
 class Lantern(Item):
 	light=True
@@ -111,7 +146,7 @@ class Lantern(Item):
 
 		self.light=not self.light
 
-class MacGuffin(Item):
+class MacGuffin(Treasure):
 	removeable=True
 	score=1000
 	def __init__(self,*arg,**kwarg):
@@ -135,7 +170,7 @@ class MacGuffin(Item):
 class Container(Item):
 	contains=None
 	is_open=False
-
+	removeable=False
 	#def __init__(self,contains=contains):
 	def __init__(self,*arg,**kwarg):
 		keywords=["desc","name","interaction","location","contains","removeable"]
@@ -164,11 +199,12 @@ class Container(Item):
 					self.contains.location=None
 
 				self.location.remove_items(self.contains)
+
 			interaction="You closed the \[b]{}\[o]".format(self.name)
 			lib.pretty_print(interaction)
 
 		else:
-			interaction="You opened the \[b]{}\[o] and you see it contains \[b]{}\[o]".format(self.name,item_name)
+			interaction="You opened the \[b]{}\[o] and you see it contains \[b]{}\[o]".format(self.name,self.contains.name)
 			lib.pretty_print(interaction)
 
 			if self.contains is not None:
@@ -307,6 +343,7 @@ class Player:
 
 class Inventory:
 	items={}
+	treasures={}
 	def __init__(self,items=items):
 		self.items=items
 
@@ -314,13 +351,22 @@ class Inventory:
 		return 'Inventory(items={!r})'.format(self.items)
 
 	def add(self,item):
-		self.items.update({item.name:item})
+		#self.items.update({item.name:item})
+		self.items[item.name]=item
+
+	def add_treasure(self,treasure):
+		self.treasure[treasure.name]=treasure
 
 	def show(self):
 		tmp_str='Your inventory contains:'
 		for item in self.items:
 			tmp_str+=f'a \[b]{item}\[o] '
-			lib.pretty_print(tmp_str)
+
+		tmp_str+="\nSo far the treasures you've collected are:"
+		for treasure in self.treasures:
+			tmp_str+=f'\[b]{treasure}\[o] '
+
+		lib.pretty_print(tmp_str)
 
 	def use(self,item):
 		if item in items:
@@ -572,6 +618,36 @@ class DarkRoom(Room):
 
 		super().print_exits()
 		self.print_items()
+
+class Bucket(Item):
+	max_capacity=30
+	current=0
+	contains=''
+	removeable=False
+	def init(self,*args,**kwargs):
+			keywords = ["desc", "name", "interaction", "location", "contains", "removeable","capacity","current"]
+
+			if len(arg) > 0:
+				for idx, opt in enumerate(arg):
+					setattr(self, keywords[idx], opt)
+			elif len(kwarg) > 0:
+				for key, value in kwarg.items():
+					setattr(self, key, value)
+			id = super()._id
+			Item._id + 1
+
+#This is a TODO room.
+#Eventually I'll have it actually have puzzles.
+class BalancedWeights(Room):
+	bucket_1={'max':30,'current':0}
+	bucket_2={'max':50,'current':0}
+
+	def interact(self,player):
+		pass
+
+	def __init__(self,*args,**kwargs):
+		keywords=['desc','items','mobs','x','y','exits','hidden_items','hidden_exits']
+		pass
 
 class FinalRoom(DarkRoom):
 	wait_condition='dark'
