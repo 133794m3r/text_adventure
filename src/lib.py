@@ -50,15 +50,15 @@ def debug(obj,player):
 		print(f"Your object {obj} wasn't found.")
 
 def use(obj,player):
-	curren_room=player.location
-	if obj in current_room.items:
-		if has_attr(current_room.items[obj],'use'):
+	current_room=player.location
+	if current_room.items is not None and obj in current_room.items:
+		if hasattr(current_room.items[obj],'use'):
 			current_room.items[obj].use(player)
 		else:
 			pretty_print(f"You can't use {obj}")
 	elif obj in player.inventory.items:
-		if has_attr(current_room.mobs[obj],'use'):
-			current_room.mobs[obj].use(player)
+		if hasattr(player.inventory.items[obj],'use'):
+			player.inventory.items[obj].use(player)
 		else:
 			pretty_print(f"You can't use {obj}")
 	else:
@@ -102,7 +102,7 @@ def check_input(usr_input: str, player: object):
 		pretty_print("Thank's for playing. I can't wait to see you again.")
 		exit(0)
 	elif verb in ('wait','w'):
-		if has_attr(current_room,'wait'):
+		if hasattr(current_room,'wait'):
 			current_room.wait(player)
 		else:
 			pretty_print('No valid input was given.')
@@ -180,22 +180,22 @@ def look(obj, player):
 
 def help(verbs, obj=None):
 	if obj is None:
-		pretty_print('''Welcome to the game. In this game you interact with the game w1orld through a simple parser.
+		pretty_print("""Welcome to the game. In this game you interact with the game w1orld through a simple parser.
 Anything you can interact with is going to be bolded. In addition to this formatting will tell you what it is.
 You give it commands in the following format. \[b][VERB] [OBJECT]\[o].1
 Where object is what you're interacting with and verb is one of these verbs \[b]"{}"\[o]. If you want help with a specific verb then run this command again like so.
 help [VERB].
 It will tell you more about the verb and how it is used.
 Mobs in the game world are \[u]underlined\[o] in addition to being \[b]bolded\[u].
-'''.format(' '.join(verbs)))
+""".format(' '.join(verbs)))
 	else:
 		# TODO: Actually write some helpful information for each of the verbs but oh well it works for now.
 		if obj == 'help':
-			pretty_print('''This command will give you help about the different verbs that you can utilize. The format is \[b]help verb\[o]. Then what you will have to do is select which verb you want to know more about to have the help information printed.
-''')
+			pretty_print("""This command will give you help about the different verbs that you can utilize. The format is \[b]help verb\[o]. Then what you will have to do is select which verb you want to know more about to have the help information printed.
+""")
 		elif obj == 'look':
-			pretty_print('''This command has an optional argument \[b]{OBJECT}\[o]. The "object" is what you want to look at. If you omit it, you will simply look at the room. Anything that you can look at will be bolded. This tells you that it is something important in the flavor text. So for example if you were in a room and you get the following shown as the description of the room. \n"You are in a dark dank room. You see a large \[b]rock\[o] that's emitting a strange light."\nThis means that if you wanted to look at this rock you'd type "look rock" and it'd give you it's description.
-				''')
+			pretty_print("""This command has an optional argument \[b]{OBJECT}\[o]. The "object" is what you want to look at. If you omit it, you will simply look at the room. Anything that you can look at will be bolded. This tells you that it is something important in the flavor text. So for example if you were in a room and you get the following shown as the description of the room. \n"You are in a dark dank room. You see a large \[b]rock\[o] that's emitting a strange light."\nThis means that if you wanted to look at this rock you'd type "look rock" and it'd give you it's description.
+				""")
 		elif obj == 'grab':
 			pass
 		elif obj == 'interact':
@@ -227,7 +227,7 @@ def pretty_format(string):
 	# Now we will be doing all color modes. They are done seperately from other ones.
 	# and you must know the color codes as I'm keeping this super simple for the regex.
 	# What I'm doing is very complex and requires a coarse in regex to understand but I'll keep it simple.
-	'''
+	"""
 	First off you need to know how python/regex works. First we're going to look for the following string.
 	PLACEHOLDER is representing some string of characters.
 	1)\[PLACEHOLDER]
@@ -242,7 +242,7 @@ def pretty_format(string):
 	7) We place them after the magic token \033[ then put the capture group there followed by 'm'.
 	8) We make this replacement go throughout the whole string till the end.
 	9) We return the string.
-	'''
+	"""
 	output_string = re.sub(r"\\\[(?<=\[)(\d.[\d|;]*)(?=\])\]", r"\033[\1m", output_string)
 	return output_string
 

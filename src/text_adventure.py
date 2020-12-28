@@ -35,15 +35,16 @@ lib.pretty_print('Your possible movements are \[b]{}\[o]'.format(' '.join(direct
 
 
 def main_loop():
-	gameover: bool=False
-	while not gameover:
+	while not player.game_over:
 		usr_input=input(prefix).lower()
 		lib.check_input(usr_input,player)
-#		dead=True
-		gameover=player.game_over
+
 	lib.pretty_print(f"You have scored {player.score} during your adventure.")
+	player.show_treasures()
 	if player.dead:
 		lib.pretty_print("You have died. Please try to stay alive longer next time.")
 	else:
-		lib.pretty_print("You have escaped from this twisted world. Though you can feel it's beckoning call to explore it's \[b]world\[o] again. Stay tuned for \[b;o]Adventure 2: The Adventuring\[o]")
-main_loop()
+		lib.pretty_print("You have escaped from this twisted world. Though you can feel it's beckoning call to explore it's \[b]world\[o] again. Stay tuned for \[b;i]Adventure 2: The Adventuring\[o]")
+
+if __name__ == "__main__":
+	main_loop()

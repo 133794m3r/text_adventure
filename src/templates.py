@@ -103,7 +103,7 @@ class Treasure(Item):
 		#no longer in the game world.
 		if self.location != -1:
 			self.move_location(-1)
-			player.inventory.add(self)
+			player.inventory.add_treasure(self)
 			player.score+=self.score
 			lib.pretty_print(f"You have grabbed \[b]{self.name}\[o] and put it into your \[b]inventory's treasure pouch\[o]")
 			player.location.remove_item(self)
@@ -135,11 +135,11 @@ class Lantern(Item):
 		else:
 			lib.pretty_print("There is no item.")
 
-	def use(self):
+	def use(self,player):
 		if self.location == -1:
 			player.alight = not player.alight
 
-		if self.light:
+		if not self.light:
 			lib.pretty_print(f"You turned on the {self.name} and a light began to emit from it.")
 		else:
 			lib.pretty_print(f"You turned off the {self.name} and the light slowly faded from it.")
@@ -162,10 +162,11 @@ class MacGuffin(Treasure):
 		#increment the item's id
 		Item._id+=1
 
-	def grab(self,player):
+	def get_item(self,player):
 		player.score+=self.score
-		super().get_item(player)
 		player.game_over=True
+		super().get_item(player)
+		print('pgv',player.game_over)
 
 class Container(Item):
 	contains=None
@@ -214,13 +215,13 @@ class Container(Item):
 		self.is_open = not self.is_open
 
 		return 0
-'''
+"""
 The weapon class is a child class of the Item class. It extends Item with it's own
 attributes that aren't part of the default item class itself.
 In python when you are doing a sub class of a main class you create it like so.
 class sub_class(main_class):
 instead of the normal attributes.
-'''
+"""
 
 class Weapon(Item):
 	damage=0
@@ -368,8 +369,13 @@ class Inventory:
 
 		lib.pretty_print(tmp_str)
 
+	def show_treasures(self):
+		tmp_str = ''
+		for i,item in enumerate(self.treasures):
+			tmp_str += f'\[b]{item}\[o], '
+		lib.pretty_print(tmp_str[:-1]+'.')
 	def use(self,item):
-		if item in items:
+		if item in self.items:
 			lib.pretty_print(item.interaction)
 		else:
 			lib.pretty_print("You don't have that item")
@@ -612,6 +618,7 @@ class DarkRoom(Room):
 			if self.hidden_items is not None:
 				super().add_items(self.hidden_items)
 			super().print_mobs()
+			lib.pretty_print(self.light)
 		else:
 			lib.pretty_print(self.dark)
 			self.print_mobs()
@@ -655,7 +662,7 @@ class FinalRoom(DarkRoom):
 	dark="The room is finally viewable now that the overwhelming light is gone."
 	light="The light is overwhelming make it impossible to see."
 	def __init__(self,dark=dark,light=light,wait_condition=wait_condition,macguffin=macguffin):
-		super().__init__(dark,light)
+		super().__init__(light,dark)
 		self.wait_condition=wait_condition
 		self.macguffin=macguffin
 
@@ -663,10 +670,15 @@ class FinalRoom(DarkRoom):
 		return 'FinalRoom(dark={!r},light={!r},wait_condition={!r},macguffin={!r},items={!r},mobs={!r},x={!r},y={!r},exits={!r},hidden_mobs={!r},hidden_items={!r}'.format(self.dark,self.light,self.wait_condition,self.macguffin,self.items,self.mobs,self.x,self.y,self.exits,self.hidden_mobs,self.hidden_items)
 
 	def wait(self,player):
+
 		if self.wait_condition == 'dark':
-			if not player.alight and self.macguffin is None:
-				super().add_items(macguffin)
-			elif macguffin in player.inventory:
+			if not player.alight and self.items is None:
+				print(self.dark)
+				print(player.alight)
+				print(self.macguffin)
+				super().add_items(self.macguffin)
+				super().print_items()
+			elif self.macguffin in player.inventory.items:
 				pass
 		else:
 			pass

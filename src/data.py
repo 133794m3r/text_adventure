@@ -31,7 +31,7 @@ north=Room("You are in a room with a single source of light. There is one exit t
 west=Room("You are in a wet room. There is a \[b]fish\[o] flopping on the ground before you.")
 east=Room("You are room.")
 south=DarkRoom("You are in a dark room. There is nothing that can be seen.","You are in a dark room. There is a terrifying beast before you a \[b]Grue\[o]")
-endgame=FinalRoom("You are in the room that appeared after the \[b]Grue\[o] was defeated. Your \[b]flashlight\[o] is burning bright at an intensity unseen before. The room is filled with a blinding light. You cannot see anything. If only there was some way to \[b]turn off\[o] that light source.","You are in the final room. With the \[b]flashlight\[o] turned off, the room is visible. You can finally see what the room contains.")
+endgame=FinalRoom("You are in the room that appeared after the \[b]Grue\[o] was defeated. Your \[b]flashlight\[o] is burning bright at an intensity unseen before. The room is filled with a blinding light. You cannot see anything. If only there was some way to \[b]turn off\[o] that light source.", "You are in the final room. With the \[b]flashlight\[o] turned off, the room is visible. You can finally see what the room contains.")
 #this is an example of something that won't be shown until some condition is done.
 south.add_hidden_exits({'s':endgame})
 flashlight=Lantern()
@@ -44,7 +44,8 @@ flashlight.name='flashlight'
 north.add_items(flashlight)
 #Here is a normal initialization fo the macguffin. This is the final item that upon getting it, it'll end the game for them.
 #it's what causes the game to end.
-macguffin=MacGuffin(name='Macguffin',desc="The amazing and wonderful \[b]macguffin\[o]. It is the greatest \[b]treasure\[o] you've ever seen. You must have it.",interaction="You touch it and it doesn't move.",location=endgame)
+macguffin=MacGuffin(name='macguffin',desc="The amazing and wonderful \[b]macguffin\[o]. It is the greatest \[b]treasure\[o] you've ever seen. You must have it.",interaction="You touch it and it doesn't move.",location=endgame)
+endgame.macguffin=macguffin
 unobtanium=Treasure(name='unobtanium',desc='The rarest mineral in the whole universe. You have only heard of it in legends prior.',interaction="As you run your fingers acorss it's surface, you can feel a strange energy flowing up your finger-tips.",location=east,removeable=True,score=500)
 treasure_chest=Container(name='treasure chest',desc="A treasure chest that's seen better days. The latch where the old lock used to be still shines.",contains=unobtanium,location=east,removeable=False)
 east.add_items(treasure_chest)
@@ -75,3 +76,4 @@ north.exits={'s':starter}
 player=Player()
 player.transport(starter)
 player.inventory=Inventory()
+player.alight = True
