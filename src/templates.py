@@ -182,8 +182,8 @@ class Container(Item):
 		elif len(kwarg) > 0:
 			for key,value in kwarg.items():
 				setattr(self,key,value)
-		id=super()._id
-		Item._id+1
+		self._id=super()._id
+		Item._id+=1
 
 
 	def __repr__(self):
@@ -194,7 +194,7 @@ class Container(Item):
 		if self.is_open:
 			self.location.remove_item(self.contains)
 			if self.contains is not None:
-				if item_contained.location == -1:
+				if self.contaims.location == -1:
 					self.contains=None
 				else:
 					self.contains.location=None
@@ -230,7 +230,7 @@ class Weapon(Item):
 	interaction="You picked up the item."
 	def __init__(self,damage=damage,desc=desc,interact=interaction,location=location):
 		self.damage=damage
-		super().__init__(desc=desc,interact=interaction,location=location)
+		super().__init__(desc=desc,interact=interact,location=location)
 
 
 class Mailbox(Item):
@@ -264,15 +264,16 @@ class Mailbox(Item):
 				if self.contains is not None:
 					self.location.add_items(self.contains)
 					item_contained.location=self.location
-
+		print(self.is_open)
 		self.is_open = not self.is_open
 
 	def look(self):
+		print(self.is_open)
 		string_to_print=self.desc
 		if self.is_open:
 			string_to_print=string_to_print.replace('closed','opened')
 			if self.contains is not None:
-				string_to_print+=' You can also see that it contains \[b]'+item_name+'\[o].'
+				string_to_print+=' You can also see that it contains \[b]'+self.contains.name+'\[o].'
 
 		lib.pretty_print(string_to_print)
 
@@ -384,7 +385,7 @@ class Inventory:
 		self.items.pop(item.name,None)
 
 
-def room_print_objs(objs: list, total_objs: str, prefix="You can see"):
+def room_print_objs(objs: list, total_objs:int , prefix="You can see"):
 	"""
 	
 	Args:
@@ -453,7 +454,7 @@ class Room:
 		items_type = type(items).__name__
 		if items_type == 'list':
 			for item in items:
-				self.items[tem.name]=item
+				self.items[item.name]=item
 		elif items_type == 'dict':
 			for item_name,item in items.items():
 				self.items[item_name]=item
@@ -530,7 +531,8 @@ class Room:
 		elif self.mobs is not None and obj in self.mobs:
 			lib.pretty_print(self.mobs[obj].desc)
 		elif self.items is not None and obj in self.items:
-			lib.pretty_print(self.items[obj].desc)
+			#lib.pretty_print(self.items[obj].desc)
+			self.items[obj].look()
 		else:
 			lib.pretty_print(f"The \[b]{obj}\[o] doesn't exist or you mistyped it. Check your spelling.")
 
@@ -574,7 +576,7 @@ class DarkRoom(Room):
 		items_type = type(items).__name__
 		if items_type == 'list':
 			for item in items:
-				self.hidden_items[tem.name]=item
+				self.hidden_items[item.name]=item
 		elif items_type == 'dict':
 			for item_name,item in items.items():
 				self.hidden_items[item_name]=item
@@ -634,11 +636,11 @@ class Bucket(Item):
 	def init(self,*args,**kwargs):
 			keywords = ["desc", "name", "interaction", "location", "contains", "removeable","capacity","current"]
 
-			if len(arg) > 0:
-				for idx, opt in enumerate(arg):
+			if len(args) > 0:
+				for idx, opt in enumerate(args):
 					setattr(self, keywords[idx], opt)
-			elif len(kwarg) > 0:
-				for key, value in kwarg.items():
+			elif len(kwargs) > 0:
+				for key, value in kwargs.items():
 					setattr(self, key, value)
 			id = super()._id
 			Item._id + 1
@@ -737,7 +739,7 @@ class Grue(Mob):
 
 	def interact(self,player):
 		#if the room is lit up we can see everything. By default the grue is always there.
-		#if you have the flashlight and interact with it. It'll tell lyou some information
+		#if you have the flashlight and interact with it. It'll tell you some information
 		#and then it'll let you shine it in it's eyes causing it run away and break through the wall
 		#thus leading to the victory room.
 		#if you interact with it without a flaslight you'll be eaten.
