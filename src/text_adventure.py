@@ -8,16 +8,7 @@ AGPLv3 or Later
 2019
 """
 
-try:
-	lib
-except NameError:
-	import lib
-
-
-import sys
 from  data import *
-
-
 
 verbs=['look','grab','move','interact','help']
 
